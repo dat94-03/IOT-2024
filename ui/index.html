@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8" /> <!-- Corrected charshet to charset -->
+
+<title>Login Page</title>
+<style>
+
+Body {
+    background-image: url('/assets/img/home.gif');
+    background-color: rgb(0, 0, 0);
+    background-repeat: no-repeat;
+    background-size: cover;
+    /* position: relative; */
+    /* backdrop-filter: blur(5px); */
+}
+
+Body::before {
+  content: "";
+  background-color: rgba(0, 0, 0, 0.68); /* black with 50% opacity */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+button {
+    background-color: #019160;
+    width: 100%;
+    color: orange;
+    padding: 15px;
+    margin: 10px 0px;
+    border: none;
+    cursor: pointer;
+}
+.loginForm {
+        border: 3px solid #f1f1f1;
+        width: 50%;
+        justify-content: center;
+        margin: 0 auto;
+        position: absolute;
+        top: 35%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+}
+input[type=text], input[type=password] {
+        width: 100%;
+        margin: 8px 0;
+        padding: 12px 20px;
+        display: inline-block;
+        border: 2px solid green;
+        box-sizing: border-box;
+}
+button:hover {
+        opacity: 0.7;
+}
+.cancelbtn {
+        width: auto;
+        padding: 10px 18px;
+        margin: 10px 5px;
+}
+
+.container {
+        padding: 25px;
+        background-color: lightblue;
+        vertical-align: middle;
+}
+</style>
+</head>
+<body>
+    <center> <h1 class="heading"> Happy Home </h1> </center>
+    <div class="loginForm">
+        <div class="container heading" style="font-family: MISA Font Bold; font-size: 18px;">
+            <label>Email: </label>
+            <input type="text" placeholder="Nhập tên tài khoản" name="email" required id="email">
+            <label>Mật khẩu: </label>
+            <input type="password" placeholder="Nhập mật khẩu" name="password" required id="password">
+            <button id="login_button" style="font-family: MISA Font Bold; font-size: 26px;" onclick="loginFunction()">Đăng nhập</button>
+        </div>
+    </div>
+
+    <!-- Include jQuery library -->
+    <script type="text/javascript" src="./js/jquery-3.6.0.min.js"></script>
+
+    <script>
+        function loginFunction() {
+            // Add http:// before localhost
+            let baseUrl = "http://localhost:3000";  // Corrected base URL with http://
+            let email = $("#email").val();
+            let password = $("#password").val();
+            $.ajax({
+                url: baseUrl + '/api/auth/login',
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=UTF-8",
+                data: JSON.stringify({
+                    email: email,
+                    password: password
+                }),
+                success: function(data) {
+                    // Store token and user name in local storage
+                    localStorage.setItem("token", "Bearer " + data.token);
+                    localStorage.setItem("nameUser", data.user.name);
+                    location.href = "/ui/iot.html";  // Redirect to the iot page
+                },
+                error: function(err) {
+                    console.log(err);
+                    alert("Tài khoản mật khẩu không chính xác");
+                }
+            });
+        }
+    </script>
+
+</body>
+
+</html>

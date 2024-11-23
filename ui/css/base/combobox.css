@@ -1,0 +1,123 @@
+.combobox {
+    position: relative;
+    /* display: flex; */
+    /* flex-direction: row; */
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.combobox__input,
+select {
+    /* width: 100%; */
+    position: relative;
+    top: 0;
+    left: 0;
+    height: 40px;
+    padding-right: 56px;
+    border-radius: 4px;
+    padding-left: 16px;
+    box-sizing: border-box;
+    outline: none;
+    border: 1px solid #ccc;
+    font-family: MISA Fonts;
+}
+
+.combobox__button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 40px;
+    border-radius: 0 4px 4px 0px;
+    width: 40px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.combobox__data {
+    padding: 4px 0px;
+    position: absolute;
+    width: 100%;
+    top: 100%;
+    left: 0;
+    border: 1px solid rgb(136, 39, 39);
+    border-radius: 4px;
+}
+
+.combobox__item {
+    line-height: 40px;
+    padding-left: 36px;
+    height: 40px;
+    /* border: 1px solid #ccc; */
+}
+
+.combobox__item:hover {
+    background-color: #e9ebee;
+}
+
+.combobox__item--selected {
+    pointer-events: none;
+    background-color: #019160;
+    color: #fff;
+}
+
+.combo-box {
+    border: 1px #bbb solid;
+    border-radius: 4px;
+    height: 40px;
+    outline: none;
+    padding-left: 16px;
+    padding-right: 16px;
+    min-width: 200px;
+    font-size: 13px;
+    color: #000;
+    /* font-family: Regular; */
+}
+
+.combo-box:focus {
+    border-color: #019160;
+    outline: #019160;
+}
+
+.combo-box-hint {
+    font-size: 11px;
+    color: #bbb;
+    /* font-family: Medium; */
+}
+
+.combo-box-label {
+    font-size: 13px;
+    color: #000;
+    /* font-family: Medium; */
+    padding-bottom: 4px;
+}
+
+.combo-box-icon {
+    background-size: 16px;
+    background-position: center;
+    width: 40px;
+}
+
+.combo-box-item {
+    font-size: 13px;
+    color: #000;
+    /* font-family: Regular; */
+    height: 40px;
+    text-align: left;
+    padding-left: 36px;
+    border: none;
+}
+
+.combo-box-item:hover {
+    background-color: #e9ebee;
+}
+
+.combo-box-item--selected {
+    background-color: #019160;
+}
+
+.combo-box-item-icon-selected {
+    /* color: #e5e5e5; */
+    background-image: url(../../asset/image/add.png);
+    background-size: 16px;
+    background-position-x: 10px;
+}
