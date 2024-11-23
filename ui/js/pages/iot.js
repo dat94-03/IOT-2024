@@ -264,8 +264,10 @@ function renderTemperature(thispage) {
     localStorage.setItem("tab", "temperature");
     const token = localStorage.getItem("token");
     const baseUrl = "http://localhost:3000";
-    const roomId = $("#roomListing :selected").val();
-    const deviceId = localStorage.getItem(`${roomId}_temperature_sensors`);
+    // const roomId = $("#roomListing :selected").val();
+    const roomId ='62ce96c7cd95012e5f7155e1'
+    // const deviceId = localStorage.getItem(`${roomId}_temperature_sensors`);
+    const deviceId='640ee2c0246bf48329d6deb1'
 
     $('.page__content').remove();
     thispage.insertAfter('.page__header');
@@ -301,9 +303,12 @@ function renderHumidity(thispage) {
     localStorage.setItem("tab", "humidity");
     const token = localStorage.getItem("token");
     const baseUrl = "http://localhost:3000";
-    const roomId = $("#roomListing :selected").val();
-    const deviceId = localStorage.getItem(`${roomId}_humidity_sensors`);
-
+    //fix cứng tạm sau sửa trên data base sau
+    // const roomId = $("#roomListing :selected").val();
+    // const deviceId = localStorage.getItem(`${roomId}_humidity_sensors`);
+    const roomId ='62ce96c7cd95012e5f7155e1'
+    // const deviceId = localStorage.getItem(`${roomId}_temperature_sensors`);
+    const deviceId='640ee2c0246bf48329d6deb1'
     $('.page__content').remove();
     thispage.insertAfter('.page__header');
 

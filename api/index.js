@@ -22,7 +22,7 @@ const app = express();
 // Enable CORS with custom config for a specific origin
 app.use(
   cors({
-    origin: 'http://localhost:5500', // Frontend origin
+    origin: ['http://localhost:5500','127.0.0.1:5500'], // Frontend origin
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true, // Allow cookies, headers, etc.
