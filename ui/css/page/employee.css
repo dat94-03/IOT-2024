@@ -1,34 +1,55 @@
-#btnRefresh {
-    border-radius: 4px;
+/* Base Button Styling */
+button {
+    border-radius: 6px; /* Slightly rounded corners for a modern look */
     height: 40px;
     width: 40px;
     border: 1px solid #bbbbbb;
+    background-color: #f9f9f9; /* Subtle light background for contrast */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease; /* Smooth hover effect */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+}
+
+/* Individual Button Styles */
+#btnRefresh {
     background-image: url(../../assets/icon/refresh.png);
     background-repeat: no-repeat;
-    /* background-position: center center; */
-    cursor: pointer;
+    background-position: center;
+    background-size: 24px 24px; /* Ensure consistent icon size */
 }
 
 #btnDelete {
-    border-radius: 4px;
-    height: 40px;
-    width: 40px;
-    border: 1px solid #bbbbbb;
     background-image: url(../../assets/icon/delete.png);
     background-repeat: no-repeat;
-    background-position: center center;
-    background-size: 20px 20px;
-    cursor: pointer;
+    background-position: center;
+    background-size: 24px 24px;
 }
 
 #btnDuplicate {
-    border-radius: 4px;
-    height: 40px;
-    width: 40px;
-    border: 1px solid #bbbbbb;
     background-image: url(../../assets/icon/duplicate.png);
     background-repeat: no-repeat;
-    background-position: center center;
-    background-size: cover;
-    cursor: pointer;
+    background-position: center;
+    background-size: 24px 24px;
+}
+
+/* Hover Effects */
+button:hover {
+    background-color: #e6e6e6; /* Slightly darker background on hover */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+    transform: translateY(-2px); /* Lift effect */
+}
+
+button:active {
+    transform: translateY(0); /* Reset lift on click */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow when pressed */
+}
+
+/* Disabled State */
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5; /* Dim appearance for disabled buttons */
+    box-shadow: none;
 }

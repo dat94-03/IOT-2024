@@ -1,176 +1,3 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./css/main.css">
-    <link rel="stylesheet" href="./css/page/employee.css">
-    <title>HAPPYHOME.VN - Kiến tạo mái ấm gia đình</title>
-</head>
-<body>
-
-    <div class="container">
-        <div class="header">
-            <div class="header__left">
-                <div class="header__sibar"></div>
-            </div>
-            <div class="header__right">
-                <div>
-                    <div class="page__header--title heading">Hệ thống giám sát nhà từ xa</div>
-                </div>
-                <div class="user">
-                    <div class="user__name" id="nameUser"></div>
-                    <div class="user__avatar"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="main">
-        <div class="menu">
-            <div class="item icon__dashboard item--selected" name="item_dashboard">Tổng quan</div>
-            <div class="item icon__temperature" name="item_temperature" onclick="renderTemperature($('#content_temperature'))">Nhiệt độ</div>
-            <div class="item icon__humidity" name="item_humidity" onclick="renderHumidity($('#content_humidity'))">Độ ẩm</div>
-        </div>
-
-        <div class="content">
-            <div class="page__header">
-                <div class="page__toolbar--left">
-                    <select name="" id="roomListing" onchange="getDeviceByRoom()">
-                        
-                    </select>
-                </div>
-            </div>
-
-            <div class="page__content" id="content_dashboard">
-                <br>
-                <div style="display: flex; position: relative;">
-                    <div class="page__content--title">Bóng đèn 1:</div>
-                    <button id="bong1" class="button__icon button__icon--lamp button__icon--lamp--on" name="bong1">Hoạt động</button>
-                </div>
-                <br>
-                <br>
-                <div style="display: flex; position: relative;">
-                    <div class="page__content--title">Bóng đèn 2:</div>
-                    <button id="bong2" class="button__icon button__icon--lamp button__icon--lamp--off" name="bong2">Tắt</button>
-                </div>
-                <br>
-                <br>
-                <div id="temperature" class="page__content--title" style="color: red;">Nhiệt độ:</div>
-                <br>
-                <br>
-                <div id="humidity" class="page__content--title" style="color: blue;">Độ ẩm:</div>
-            </div>
-
-            <div class="page__content" id="content_temperature">
-                <br>
-                <div class="page__header--title heading" style="font-size: 16px;">Thống kê nhiệt độ</div>
-                <br>
-                <div class="chartContainer"></div>
-            </div>
-
-            <div class="page__content" id="content_humidity">
-                <br>
-                <div class="page__header--title heading" style="font-size: 16px;">Thống kê độ ẩm</div>
-                <br>
-                <div class="chartContainer"></div>
-            </div>
-        </div>
-    </div>
-
-    <script type="text/javascript" src="./js/jquery-3.6.0.min.js"></script>
-    <script type="text/javascript" src="./js/jquery.canvasjs.min.js"></script>
-    <script type="text/javascript" src="./js/mqttws31.js"></script>
-    <script src="./js/pages/pub.js"></script>
-    <script src="./js/pages/sub.js"></script>
-    <script src="./js/pages/iot.js"></script>
-
-    <script>
-        var token = localStorage.getItem("token");
-        var baseUrl = "http://localhost:3000";
-
-        // Load rooms dynamically
-        $.ajax({
-            url: baseUrl + "/api/room",
-            type: "get",
-            dataType: "json",   
-            contentType: "application/json; charset=UTF-8",
-            headers: {
-                'Authorization': token
-            },
-            success: function(data) {
-                data.forEach(room => {
-                    $('#roomListing').append($('<option>', {
-                        value: room._id,
-                        text: room.name
-                    }));
-                });
-                getDeviceByRoom();
-            }
-        });
-
-        // Set user name from localStorage
-        $("#nameUser").text(localStorage.getItem("nameUser"));
-
-        async function getDeviceByRoomId(roomId) {
-            $.ajax({
-                url: baseUrl + `/api/device/room/${roomId}`,
-                type: "get",
-                dataType: "json",   
-                contentType: "application/json; charset=UTF-8",
-                headers: {
-                    'Authorization': token
-                },
-                success: function(data) {
-                    const leds = data.leds;
-                    const sensors = data.sensors;
-                    let dataDevice = "";
-                    $("#content_dashboard").empty();
-
-                    // Update for LED devices
-                    leds.forEach(led => {
-                        let str = `<div style="display: flex; position: relative;">`;
-                        str += `<div class="page__content--title">${led.deviceName}: </div>`;
-                        str += `<button id="${led._id}" class="button__icon button__icon--lamp ${led.status === 'ON' ? 'button__icon--lamp--on' : 'button__icon--lamp--off'}" onclick="changeLampStatus('${led._id}')">${led.status === 'ON' ? 'Hoạt động' : 'Tắt'}</button>`;
-                        str += `</div><br><br>`;
-                        dataDevice += str;
-                    });
-
-                    // Update for sensor devices
-                    sensors.forEach(sensor => {
-                        if (sensor.deviceType.name === "humidity_sensors") {
-                            dataDevice += `<br><div id="${sensor._id}" class="page__content--title" style="color: blue;">${sensor.deviceName}: ${sensor.value}%</div><br>`;
-                        }
-                        if (sensor.deviceType.name === "temperature_sensors") {
-                            dataDevice += `<br><div id="${sensor._id}" class="page__content--title" style="color: red;">${sensor.deviceName}: ${sensor.value.toFixed(2)}°C</div><br>`;
-                        }
-                    });
-
-                    $("#content_dashboard").append(dataDevice);
-                }
-            });
-        }
-
-        async function getDeviceByRoom() {
-            const roomId = $("#roomListing :selected").val();
-            const tab = localStorage.getItem("tab");
-            if (tab === "temperature") {
-                renderTemperature($("#content_temperature"));
-            } else if (tab === "humidity") {
-                renderHumidity($("#content_humidity"));
-            } else {
-                await getDeviceByRoomId(roomId);
-            }
-        }
-
-        function changeLampStatus(deviceId) {
-            // Add your code here to change lamp status (ON/OFF)
-            console.log('Changing lamp status for device', deviceId);
-        }
-    </script>
-</body>
-</html> -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -179,11 +6,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
     <link rel="stylesheet" href="./css/main.css">
     <link rel="stylesheet" href="./css/page/employee.css">
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js"></script> -->
-    <!-- <link rel="stylesheet" href="../assets/font/fontawesome-5.15.1/css/font-awesome.min.css"> -->
     <title>Smart Home</title>
 </head>
 
@@ -193,7 +17,7 @@
         <div class="header">
             <div class="header__left">
                 <div class="header__sibar"></div>
-                <!-- <div class="header__logo"></div> -->
+                <!-- <div class="header__logo"></div>-->
             </div>
             <div class="header__right">
                 <div>
@@ -217,22 +41,22 @@
             <div class="item icon__dashboard item--selected" name = "item_dashboard">Tổng quan</div>
             <div class="item icon__temperature" name = "item_temperature" onclick="renderTemperature($(`#content_temperature`))">Nhiệt độ</div>
             <div class="item icon__humidity" name = "item_humidity" onclick="renderTemperature$(`#content_humidity`)">Độ ẩm</div>
+            <!-- logic để load ra 2 cái biểu đồ ở file iot.js nhé ae -->
             <!-- <div class="item icon__lamp" name = "item_lamp">Thiết bị</div> -->
-
         </div>
 
         <div class="content">
             <div class="page__header">
                 <div class="page__toolbar--left">
                     <select name="" id="roomListing" onchange="getDeviceByRoom()">
-                        <!-- <option value="1">Phòng khách</option>
-                        <option value="2">Ban công</option> -->
+                        <option value="1">Phòng khách</option>
+                        <option value="2">Ban công</option>
                     </select>
-                    <!-- <input id="searchInput" type="text" class="input input__icon input__icon--search" title="Tìm kiếm theo mã hoặc tên"> -->
-                    <!-- <input id="searchInput" type="text" class="input" title="Tối đa 30 giờ tới"> -->
+                    <!-- <input id="searchInput" type="text" class="input input__icon input__icon--search" title="Tìm kiếm theo mã hoặc tên"> 
+                     <input id="searchInput" type="text" class="input" title="Tối đa 30 giờ tới"> -->
                    
                 </div>
-                <!-- <button id="btnRefresh" class="page__header--button button button__icon button__icon--refresh">Refresh</button> -->
+                <button id="btnRefresh" class="page__header--button button button__icon button__icon--refresh">Refresh</button>
             </div>
 
             <div class="page__content" id="content_dashboard">
@@ -249,10 +73,10 @@
                 </div>
                 <br> 
                 <br>
-                <div id="temperature" class="page__content--title" style = "color: red;">Nhiệt độ:</div>
+                <div id="temperature" class="page__content--title" style = "color: rgb(198, 101, 101);">Nhiệt độ:</div>
                 <br> 
                 <br>
-                <div id="humidity" class="page__content--title" style = "color: blue;">Độ ẩm:</div>
+                <div id="humidity" class="page__content--title" style = "color: rgb(92, 147, 189);">Độ ẩm:</div>
                 
             </div>
 
@@ -261,11 +85,11 @@
                 <div class="page__header--title heading" style = "font-size: 16px;">Thống kê nhiệt độ</div>
                 <br> 
                 <div class="chartContainer" style = ""></div>
-                <!-- <div style = "display: flex; padding-left: 20px; width: 100px">
+                <div style = "display: flex; padding-left: 20px; width: 100px">
                    
                     <div class="chartContainer"></div>
-                </div> -->
-            </div>
+                </div>
+            </div> 
 
             <div class="page__content" id="content_humidity">
                 <br> 
@@ -273,10 +97,6 @@
                 <br> 
                 <div class="chartContainer" style = "border:100px;  "></div>
             </div>
-
-            <!-- <div class="page__content" id="content_lamp">
-                <div class="page__header--title heading" style = "font-size: 16px;">3</div>
-            </div> -->
 
         </div>
     
@@ -287,15 +107,10 @@
 
     <!-- nhúng các thư viện -->
     <script type="text/javascript" src="./js/jquery-3.6.0.min.js"></script>
-    <!-- <script type="text/javascript" src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script> -->
     <script type="text/javascript" src="./js/jquery.canvasjs.min.js"></script>
     <script type="text/javascript" src="./js/mqttws31.js"></script>
 
     <!-- Nhúng các js dùng chung -->
-    <!-- <script src="/js/format.js"></script> -->
-
-    <!-- Nhúng các js sử dụng riêng cho trang -->
-    <!-- <script src="/js/pages/employee.js"></script> -->
     <script src="./js/pages/pub.js"></script>
     <script src="./js/pages/sub.js"></script>
     <script src="./js/pages/iot.js"></script>
