@@ -1,11 +1,14 @@
 var mqtt = require('mqtt')
 
 var options = {
-    host: "21d87a63d7064472b2615fc6e38d6919.s1.eu.hivemq.cloud",
+    // host: "21d87a63d7064472b2615fc6e38d6919.s1.eu.hivemq.cloud",
+    host: "d2d60be70c7847508b58bd5018279da5.s1.eu.hivemq.cloud",
     port: 8883,
     protocol: 'mqtts',
-    username: "tiendat",
-    password: "iot2024"
+    // username: "tiendat",
+    // password: "iot2024"
+    username: "AnhDuc",
+    password: "iot_hust_2024/data"
 }
 // const char *WifiSSID = "July1992 Coffee";
 // const char *WifiPassword = "July1992"; //wifi nhà 

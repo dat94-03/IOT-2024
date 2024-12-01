@@ -14,32 +14,47 @@ console.log(username, password);
 const addOneData = async (data) => {
     try {
         const now = (new Date()).toISOString();
-        const name = data.name;
-        if (!name) {
-            console.log(`${now}: Name of data is missing`);
+        const deviceId = data.roomId;
+
+        if (!deviceId) {
+            console.log(`${now}: Device ID is missing`);
             return;
         }
-    
-        let value = data.value;
-        if (value == undefined) {
-            console.log(`${now}: Value of data is missing`);
-            return;
-        }
-        data["timestamp"] = now;
-    
-        const result = await DeviceData.create(data);
-        if (name == "status" && (data.value == "ON" || data.value == "OFF")) {
-            await Device.findByIdAndUpdate(data.deviceId, {
-                status: data.value
+
+        if (data.temperature !== undefined) {
+            await DeviceData.create({
+                name: "temperature",
+                value: data.temperature,
+                deviceId: deviceId,
+                timestamp: now
             });
-        } else {
-            await Device.findByIdAndUpdate(data.deviceId, {
-                value: data.value
+            await Device.findByIdAndUpdate(deviceId, {
+                value: data.temperature
             });
         }
-        return result;
+
+        if (data.humidity !== undefined) {
+            await DeviceData.create({
+                name: "humidity", 
+                value: data.humidity,
+                deviceId: deviceId,
+                timestamp: now
+            });
+        }
+
+        if (data.gasLevel !== undefined) {
+            await DeviceData.create({
+                name: "gasLevel",
+                value: data.gasLevel,
+                deviceId: deviceId,
+                timestamp: now
+            });
+        }
+
+        console.log(`${now}: Data saved successfully`);
+        return true;
     } catch (err) {
-        console.log(err);
+        console.log(`Error saving data: ${err}`);
         return null;
     }
 }
@@ -47,7 +62,8 @@ const addOneData = async (data) => {
 const addDatas = async (topic, message) => {
     try {
         const msgJson = JSON.parse(message.toString());
-        console.log(topic, msgJson);
+        console.log(`Received message on ${topic}:`, msgJson);
+        
         if (Array.isArray(msgJson)) {
             for (let data of msgJson) {
                 await addOneData(data);
@@ -56,7 +72,7 @@ const addDatas = async (topic, message) => {
             await addOneData(msgJson);
         }
     } catch (err) {
-        console.log(err);
+        console.log('Error processing message:', err);
     }
 }
 

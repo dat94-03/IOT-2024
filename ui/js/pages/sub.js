@@ -1,4 +1,6 @@
 const client_id_receiver = 'python-mqtt-receiver';
+const ROOM_1_ID = '62ce96c7cd95012e5f7155e1';
+const ROOM_2_ID = 'your_room_2_id';
 
 // Create a MQTT client instance
 const receiver = new Paho.MQTT.Client(broker, port, client_id_receiver);
@@ -30,35 +32,43 @@ function onConnectionLost(response) {
 
 // Function to run when a message is received from the broker
 function onMessageArrived(message) {
-  let info = JSON.parse(message.payloadString);
-
-  const infoId = info.deviceId;
-  const value = info.value;
-
+  let data = JSON.parse(message.payloadString);
   const tab = localStorage.getItem("tab");
 
-  if (info.name == "status") {
-    setLampStatus($(`#${infoId}`), value);
-  } else if (info.name == "temperature"){
-    if (value != undefined){
-      $(`#${infoId}`).text('Nhiệt độ: ' + value + String.fromCharCode(8451));
-    } else {
-      $(`#${infoId}`).text('Nhiệt độ: Không thu được kết quả ');
-    }
-    if (tab == "temperature") {
-      renderTemperature($("#content_temperature"));
-    } 
-
-  } else if (info.name == "humidity"){
-    if (value != undefined){
-      $(`#${infoId}`).text('Độ ẩm: ' + value + "%");
-    } else {
-      $(`#${infoId}`).text('Độ ẩm: Không thu được kết quả g/m');
-    }
-    if (tab == "humidity") {
-        renderHumidity($("#content_humidity"));
-    }
+  // Xử lý theo từng phòng
+  switch(data.roomId) {
+    case ROOM_1_ID:
+      updateRoom1Data(data);
+      break;
+    case ROOM_2_ID: 
+      updateRoom2Data(data);
+      break;
+    default:
+      console.log("Unknown room ID:", data.roomId);
   }
+
+  // Cập nhật biểu đồ nếu đang ở tab tương ứng
+  if (tab == "temperature") {
+    renderTemperature($("#content_temperature"));
+  } else if (tab == "humidity") {
+    renderHumidity($("#content_humidity"));
+  } else if (tab == "gas") {
+    renderGasLevel($("#content_gas"));
+  }
+}
+
+function updateRoom1Data(data) {
+  // Cập nhật UI cho phòng 1
+  $("#room1_temp").text('Nhiệt độ: ' + data.temperature + String.fromCharCode(8451));
+  $("#room1_humidity").text('Độ ẩm: ' + data.humidity + "%");
+  $("#room1_gas").text('Nồng độ khí: ' + data.gasLevel + " ppm");
+}
+
+function updateRoom2Data(data) {
+  // Cập nhật UI cho phòng 2  
+  $("#room2_temp").text('Nhiệt độ: ' + data.temperature + String.fromCharCode(8451));
+  $("#room2_humidity").text('Độ ẩm: ' + data.humidity + "%");
+  $("#room2_gas").text('Nồng độ khí: ' + data.gasLevel + " ppm");
 }
 
 function setLampStatus(lamp, value){
