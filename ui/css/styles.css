@@ -3,7 +3,7 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #121212; /* Dark theme background */
+    background-color: #2a549b; /* Dark theme background */
     background-image: url('./assets/img/home.gif');
     background-size: cover;
     background-repeat: no-repeat;
@@ -40,9 +40,9 @@ body::before {
 /* Login Form Container */
 .loginForm {
     border-radius: 10px;
-    width: 90%;
+    width: 100%;
     max-width: 400px;
-    background: #1e1e1e; /* Dark background for form */
+    background: #2e4156; /* Dark background for form */
     padding: 20px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
     z-index: 1;
@@ -50,7 +50,7 @@ body::before {
 
 /* Input Fields */
 input[type=text], input[type=password] {
-    width: 100%;
+    width: 90%;
     margin: 10px 0;
     padding: 12px;
     border: 1px solid #333;
