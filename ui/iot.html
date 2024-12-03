@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -16,14 +17,15 @@
         <div class="header">
             <div class="header__left">
                 <div class="header__sibar"></div>
+                <!-- <div class="header__logo"></div>-->
             </div>
             <div class="header__right">
                 <div>
                     <div class="page__header--title heading">Hệ thống giám sát nhà từ xa</div>
-                    <select id="roomSelector" class="room-selector">
-                        <option value="62ce96c7cd95012e5f7155e1">Phòng 1</option>
-                        <option value="your_room_2_id">Phòng 2</option>
-                    </select>
+                    <!-- <select name="" id="">
+                        <option value="1">Phòng khách</option>
+                        <option value="2">Ban công</option>
+                    </select> -->
                 </div>
                 <div class="user">
                     <div class="user__name" id="nameUser"></div>
@@ -38,47 +40,62 @@
 
             <div class="item icon__dashboard item--selected" name = "item_dashboard">Tổng quan</div>
             <div class="item icon__temperature" name = "item_temperature" onclick="renderTemperature($(`#content_temperature`))">Nhiệt độ</div>
-            <div class="item icon__humidity" name = "item_humidity" onclick="renderHumidity($(`#content_humidity`))">Độ ẩm</div>
-            <div class="item icon__gas" name="item_gas" onclick="renderGasLevel($(`#content_gas`))">Nồng độ khí</div>
+            <div class="item icon__humidity" name = "item_humidity" onclick="renderTemperature$(`#content_humidity`)">Độ ẩm</div>
+            <!-- logic để load ra 2 cái biểu đồ ở file iot.js nhé ae -->
+            <!-- <div class="item icon__lamp" name = "item_lamp">Thiết bị</div> -->
         </div>
 
         <div class="content">
             <div class="page__header">
                 <div class="page__toolbar--left">
-                    <button id="btnRefresh" class="page__header--button button button__icon button__icon--refresh">Refresh</button>
+                    <select name="" id="roomListing" onchange="getDeviceByRoom()">
+                        <option value="1">Phòng khách</option>
+                        <option value="2">Ban công</option>
+                    </select>
+                    <!-- <input id="searchInput" type="text" class="input input__icon input__icon--search" title="Tìm kiếm theo mã hoặc tên"> 
+                     <input id="searchInput" type="text" class="input" title="Tối đa 30 giờ tới"> -->
+                   
                 </div>
+                <button id="btnRefresh" class="page__header--button button button__icon button__icon--refresh">Refresh</button>
             </div>
 
             <div class="page__content" id="content_dashboard">
                 <br> 
-                <div id="temperature" class="page__content--title" style="color: rgb(198, 101, 101);">Nhiệt độ:</div>
+                <div style = "display: flex; position: relative;">
+                    <div class="page__content--title">Bóng đèn 1:</div>
+                    <button id="bong1" class="button__icon button__icon--lamp button__icon--lamp--on" name="bong1">Hoạt động</button>
+                </div>
                 <br> 
                 <br>
-                <div id="humidity" class="page__content--title" style="color: rgb(92, 147, 189);">Độ ẩm:</div>
+                <div style = "display: flex; position: relative;">
+                    <div class="page__content--title">Bóng đèn 2:</div>
+                    <button id="bong2" class="button__icon button__icon--lamp button__icon--lamp--off" name="bong2">Tắt</button>
+                </div>
+                <br> 
                 <br>
+                <div id="temperature" class="page__content--title" style = "color: rgb(198, 101, 101);">Nhiệt độ:</div>
+                <br> 
                 <br>
-                <div id="gasLevel" class="page__content--title" style="color: rgb(150, 150, 150);">Nồng độ khí:</div>
+                <div id="humidity" class="page__content--title" style = "color: rgb(92, 147, 189);">Độ ẩm:</div>
+                
             </div>
 
             <div class="page__content" id="content_temperature">
                 <br> 
-                <div class="page__header--title heading" style="font-size: 16px;">Thống kê nhiệt độ</div>
+                <div class="page__header--title heading" style = "font-size: 16px;">Thống kê nhiệt độ</div>
                 <br> 
-                <div class="chartContainer"></div>
+                <div class="chartContainer" style = ""></div>
+                <div style = "display: flex; padding-left: 20px; width: 100px">
+                   
+                    <div class="chartContainer"></div>
+                </div>
             </div> 
 
             <div class="page__content" id="content_humidity">
                 <br> 
-                <div class="page__header--title heading" style="font-size: 16px;">Thống kê độ ẩm</div>
+                <div class="page__header--title heading" style = "font-size: 16px;">Thống kê độ ẩm</div>
                 <br> 
-                <div class="chartContainer"></div>
-            </div>
-
-            <div class="page__content" id="content_gas">
-                <br> 
-                <div class="page__header--title heading" style="font-size: 16px;">Thống kê nồng độ khí</div>
-                <br> 
-                <div class="chartContainer"></div>
+                <div class="chartContainer" style = "border:100px;  "></div>
             </div>
 
         </div>

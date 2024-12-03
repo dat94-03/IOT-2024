@@ -1,20 +1,22 @@
 const mongoose = require('mongoose');
 
 const DeviceDataSchema = mongoose.Schema({
-    name: {
-        type: String
-    },
-    value: {
-        type: mongoose.Schema.Types.Mixed,
-        required: true
-    },
-    timestamp: {
-        type: Date,
-        default: Date.now()
-    },
     deviceId: {
         type: mongoose.Types.ObjectId,
         required: true
+    },
+    temperature: {
+        type: Number
+    },
+    humidity: {
+        type: Number
+    },
+    gasLevel: {
+        type: Number
+    },
+    timestamp: {
+        type: Date,
+        default: Date.now
     }
 });
 

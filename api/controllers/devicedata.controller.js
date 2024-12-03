@@ -5,26 +5,32 @@ const { StatusCodes } = require('http-status-codes');
 const getDeviceData = async (req, res) => {
     try {
         const deviceId = req.body.deviceId;
+        console.log("Fetching data for device:", deviceId); // Debug
 
         const resultx = await DeviceData.find({
-            deviceId: deviceId
+            deviceId: deviceId,
+            name: { $in: ['temperature', 'humidity'] }
         }).sort({timestamp: -1}).limit(10);
+
+        console.log("Found data:", resultx); // Debug
+
         const result = [];
         for (let i = resultx.length - 1; i >= 0; i--) {
             result.push(resultx[i]);
         }
-        const returnedResult = [];
-        if (result.length > 0) {
-            for (data of result) {
-                const date = data["timestamp"];
-                const dateString = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
-                data = data.toObject();
-                data.time = dateString;
-                returnedResult.push(data);
-            }
-        }
+
+        const returnedResult = result.map(data => {
+            const date = data.timestamp;
+            const dateString = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+            return {
+                ...data.toObject(),
+                time: dateString
+            };
+        });
+
         return res.status(StatusCodes.OK).json({ result: returnedResult });
     } catch (err) {
+        console.error("Error in getDeviceData:", err); // Debug
         return res.status(400).json({"err": err.toString()});
     }
 }

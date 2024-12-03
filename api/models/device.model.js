@@ -1,11 +1,6 @@
 const mongoose = require('mongoose');
 
 const DeviceSchema = mongoose.Schema({
-    deviceType: {
-        type: mongoose.Types.ObjectId,
-        required: true,
-        ref: "DeviceType"
-    },
     roomId: {
         type: mongoose.Types.ObjectId,
         required: true
@@ -14,14 +9,6 @@ const DeviceSchema = mongoose.Schema({
         type: String,
         enum: ['ON', 'OFF'],
         default: 'ON'
-    },
-    deviceName: {
-        type: String,
-        required: true
-    },
-    value: {
-        type: Number,
-        default: 0
     }
 }, {
     timestamps: true

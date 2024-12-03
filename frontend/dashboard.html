@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống giám sát nhà từ xa</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="menu-item active">
+            <img src="icons/overview.png" alt="Tổng quan">
+            <span>Tổng quan</span>
+        </div>
+        <div class="menu-item">
+            <img src="icons/temperature.png" alt="Nhiệt độ">
+            <span>Nhiệt độ</span>
+        </div>
+        <div class="menu-item">
+            <img src="icons/humidity.png" alt="Độ ẩm">
+            <span>Độ ẩm</span>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <h1>Hệ thống giám sát nhà từ xa</h1>
+            <div class="user-info">
+                <span id="userName"></span>
+                <button id="logoutBtn">Đăng xuất</button>
+            </div>
+        </header>
+
+        <div class="room-control">
+            <select id="roomSelect">
+                <option value="62ce96c7cd95012e5f7155e2">62ce96c7cd95012e5f7155e2</option>
+                <option value="62ce96c7cd95012e5f7155e5">62ce96c7cd95012e5f7155e5</option>
+            </select>
+            <button id="refreshBtn">Refresh</button>
+        </div>
+
+        <div class="light-controls">
+            <div class="light-item">
+                <span>Bóng đèn 1:</span>
+                <button class="light-btn active" data-light="1">Hoạt động</button>
+            </div>
+            <div class="light-item">
+                <span>Bóng đèn 2:</span>
+                <button class="light-btn off" data-light="2">Tắt</button>
+            </div>
+        </div>
+
+        <div class="sensor-stats">
+            <div class="stat-item">
+                <h3>Nhiệt độ:</h3>
+                <span id="tempValue">--°C</span>
+            </div>
+            <div class="stat-item">
+                <h3>Độ ẩm:</h3>
+                <span id="humidValue">--%</span>
+            </div>
+        </div>
+
+        <div class="chart-controls">
+            <select id="chartTypeSelect">
+                <option value="temperature">Nhiệt độ</option>
+                <option value="humidity">Độ ẩm</option>
+            </select>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="sensorChart"></canvas>
+        </div>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+</body>
+</html> 

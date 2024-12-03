@@ -1,6 +1,5 @@
 const mqtt = require("mqtt");
 const DeviceData = require('../models/devicedata.model');
-const Device = require('../models/device.model');
 
 const topic1 = process.env.TOPIC1;
 const topic2 = process.env.TOPIC2;
@@ -13,45 +12,23 @@ console.log(username, password);
 
 const addOneData = async (data) => {
     try {
-        const now = (new Date()).toISOString();
-        const deviceId = data.roomId;
+        const now = new Date();
+        const { deviceId, temperature, humidity, gasLevel } = data;
 
         if (!deviceId) {
-            console.log(`${now}: Device ID is missing`);
+            console.log(`${now.toISOString()}: device ID is missing`);
             return;
         }
 
-        if (data.temperature !== undefined) {
-            await DeviceData.create({
-                name: "temperature",
-                value: data.temperature,
-                deviceId: deviceId,
-                timestamp: now
-            });
-            await Device.findByIdAndUpdate(deviceId, {
-                value: data.temperature
-            });
-        }
+        await DeviceData.create({
+            deviceId,
+            temperature,
+            humidity,
+            gasLevel,
+            timestamp: now
+        });
 
-        if (data.humidity !== undefined) {
-            await DeviceData.create({
-                name: "humidity", 
-                value: data.humidity,
-                deviceId: deviceId,
-                timestamp: now
-            });
-        }
-
-        if (data.gasLevel !== undefined) {
-            await DeviceData.create({
-                name: "gasLevel",
-                value: data.gasLevel,
-                deviceId: deviceId,
-                timestamp: now
-            });
-        }
-
-        console.log(`${now}: Data saved successfully`);
+        console.log(`${now.toISOString()}: Data saved successfully`);
         return true;
     } catch (err) {
         console.log(`Error saving data: ${err}`);

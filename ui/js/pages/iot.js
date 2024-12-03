@@ -1,87 +1,24 @@
-const BASE_URL = "http://localhost:3000";
+const BASE_URL="http://localhost:3000"
+
 
 const content_dashboard = $("#content_dashboard");
 const content_temperature = $("#content_temperature");
 const content_humidity = $("#content_humidity");
 const content_lamp = $("#content_lamp");
-const content_gas = $("#content_gas");
-
-// Thêm hằng số cho deviceId/roomId
-const ROOM_1_ID = "62ce96c7cd95012e5f7155e1";
-const ROOM_2_ID = "62ce96c7cd95012e5f7155e2";
-
-// Thêm hàm helper để lấy tên phòng
-function getRoomName(deviceId) {
-    switch(deviceId) {
-        case ROOM_1_ID:
-            return "Phòng 1";
-        case ROOM_2_ID:
-            return "Phòng 2";
-        default:
-            return "Không xác định";
-    }
-}
 
 $(document).ready(function () {
     // gán các sự kiện cho các element:
     renderDashboard(content_dashboard);
     initEvents();
+
+    // Load dữ liệu:
     loadData();
-    
-    // Tự động refresh dữ liệu mỗi 5 giây
-    setInterval(loadData, 5000);
 });
 
 function loadData() {
-    const currentRoom = localStorage.getItem("currentRoom") || ROOM_1_ID;
-    
-    // Load nhiệt độ
-    $.ajax({
-        url: BASE_URL + `/api/data`,
-        type: "post",
-        contentType: "application/json",
-        data: JSON.stringify({ 
-            deviceId: currentRoom,
-            name: "temperature"  // Thêm tham số name để lọc loại dữ liệu
-        }),
-        success: function (data) {
-            if (data && data.result && data.result.length > 0) {
-                $("#temperature_value").text(data.result[0].value + "°C");
-            }
-        }
-    });
-
-    // Load độ ẩm
-    $.ajax({
-        url: BASE_URL + `/api/data`,
-        type: "post",
-        contentType: "application/json",
-        data: JSON.stringify({ 
-            deviceId: currentRoom,
-            name: "humidity"
-        }),
-        success: function (data) {
-            if (data && data.result && data.result.length > 0) {
-                $("#humidity_value").text(data.result[0].value + "%");
-            }
-        }
-    });
-
-    // Load nồng độ khí
-    $.ajax({
-        url: BASE_URL + `/api/data`,
-        type: "post",
-        contentType: "application/json",
-        data: JSON.stringify({ 
-            deviceId: currentRoom,
-            name: "gasLevel"
-        }),
-        success: function (data) {
-            if (data && data.result && data.result.length > 0) {
-                $("#gas_value").text(data.result[0].value + " ppm");
-            }
-        }
-    });
+    // You can add a data refreshing mechanism here
+    console.log("Load data triggered");
+    // Example: Call AJAX to refresh data if needed.
 }
 
 // Initialize event handlers for tabs
@@ -101,9 +38,6 @@ function initEvents() {
             case "item_humidity":
                 renderHumidity(content_humidity);
                 break;
-            case "item_gas":
-                renderGasLevel(content_gas);
-                break;
             case "item_lamp":
                 renderLamp(content_lamp);
                 break;
@@ -112,22 +46,6 @@ function initEvents() {
 
     $("#btnRefresh").click(function () {
         loadData();
-    });
-
-    // Cập nhật room selector
-    const roomSelector = $("#roomSelector");
-    roomSelector.empty();
-    roomSelector.append(`<option value="${ROOM_1_ID}">Phòng 1</option>`);
-    roomSelector.append(`<option value="${ROOM_2_ID}">Phòng 2</option>`);
-    
-    // Đặt giá trị mặc định từ localStorage hoặc ROOM_1_ID
-    const savedRoom = localStorage.getItem("currentRoom") || ROOM_1_ID;
-    roomSelector.val(savedRoom);
-
-    roomSelector.change(function() {
-        const selectedRoom = $(this).val();
-        localStorage.setItem("currentRoom", selectedRoom);
-        loadData(); // Tải lại data cho phòng được chọn
     });
 }
 
@@ -140,80 +58,79 @@ function renderDashboard(thispage) {
 
 // Function to render temperature data and chart
 function renderTemperature(thispage) {
-    const currentRoom = localStorage.getItem("currentRoom") || ROOM_1_ID;
-    
+    localStorage.setItem("tab", "temperature");
+    const token = localStorage.getItem("token");
+    const baseUrl = BASE_URL;
+    // const roomId = $("#roomListing :selected").val();
+    const roomId ='62ce96c7cd95012e5f7155e1'
+    // const deviceId = localStorage.getItem(`${roomId}_temperature_sensors`);
+    const deviceId='640ee2c0246bf48329d6deb1'
+
     $('.page__content').remove();
     thispage.insertAfter('.page__header');
 
     $.ajax({
-        url: BASE_URL + `/api/data`,
+        url: baseUrl + `/api/data`,
         type: "post",
-        contentType: "application/json",
-        data: JSON.stringify({ roomId: currentRoom }),
-        success: function (data) {
-            if (data && data.result && data.result.length > 0) {
-                const options = [];
-                for (let i = 0; i < data.result.length; i++) {
-                    options.push({
-                        label: data.result[i].time.split(' ')[1],
-                        y: data.result[i].temperature
-                    });
-                }
-                drawLinePlot("Nhiệt độ " + String.fromCharCode(8451), options, "&#8451");
-            } else {
-                console.error("Không có dữ liệu trả về");
-            }
+        dataType: "json",
+        contentType: "application/json; charset=UTF-8",
+        headers: {
+            'Authorization': token
         },
-        error: function(xhr, status, error) {
-            console.error("Lỗi API:", error);
+        data: JSON.stringify({ deviceId: deviceId }),
+        success: function (data) {
+            const options = [];
+            for (let i = 0; i < data.result.length; i++) {
+                const res = data.result[i];
+                options.push({
+                    label: res.time.split(' ')[1], // Only display time part
+                    y: res.value
+                });
+            }
+            drawLinePlot("Nhiệt độ " + String.fromCharCode(8451), options, "&#8451");
+        },
+        error: function (xhr, status, error) {
+            console.error("Error fetching temperature data:", status, error);
         }
     });
 }
 
 // Function to render humidity data and chart
 function renderHumidity(thispage) {
-    const currentRoom = localStorage.getItem("currentRoom") || ROOM_1_ID;
-    
-    $('.page__content').remove();
-    thispage.insertAfter('.page__header');
-
-    $.ajax({
-        url: baseUrl + `/api/data`,
-        type: "post", 
-        data: JSON.stringify({ roomId: currentRoom }),
-        success: function (data) {
-            const options = [];
-            for (let i = 0; i < data.result.length; i++) {
-                options.push({
-                    label: data.result[i].time.split(' ')[1],
-                    y: data.result[i].humidity
-                });
-            }
-            drawLinePlot("Độ ẩm %", options, "%");
-        }
-    });
-}
-
-// Thêm hàm render cho gas level
-function renderGasLevel(thispage) {
-    const currentRoom = localStorage.getItem("currentRoom") || ROOM_1_ID;
-    
+    localStorage.setItem("tab", "humidity");
+    const token = localStorage.getItem("token");
+    const baseUrl = BASE_URL;
+    //fix cứng tạm sau sửa trên data base sau
+    // const roomId = $("#roomListing :selected").val();
+    // const deviceId = localStorage.getItem(`${roomId}_humidity_sensors`);
+    const roomId ='62ce96c7cd95012e5f7155e1'
+    // const deviceId = localStorage.getItem(`${roomId}_temperature_sensors`);
+    const deviceId='640ee2b1246bf48329d6dead'
     $('.page__content').remove();
     thispage.insertAfter('.page__header');
 
     $.ajax({
         url: baseUrl + `/api/data`,
         type: "post",
-        data: JSON.stringify({ roomId: currentRoom }),
+        dataType: "json",
+        contentType: "application/json; charset=UTF-8",
+        headers: {
+            'Authorization': token
+        },
+        data: JSON.stringify({ deviceId: deviceId }),
         success: function (data) {
             const options = [];
             for (let i = 0; i < data.result.length; i++) {
+                const res = data.result[i];
                 options.push({
-                    label: data.result[i].time.split(' ')[1],
-                    y: data.result[i].gasLevel
+                    label: res.time.split(' ')[1],
+                    y: res.value
                 });
             }
-            drawLinePlot("Nồng độ khí (ppm)", options, "ppm");
+            drawLinePlot("Độ ẩm %", options, "g/m<sup>3</sup>");
+        },
+        error: function (xhr, status, error) {
+            console.error("Error fetching humidity data:", status, error);
         }
     });
 }
@@ -236,12 +153,9 @@ function changeLampStatus(lamp_id) {
 
 // Function to draw the line plot for temperature/humidity
 function drawLinePlot(title, options, unit) {
-    const currentRoom = localStorage.getItem("currentRoom") || ROOM_1_ID;
-    const roomName = getRoomName(currentRoom);
-    
     $(".chartContainer").CanvasJSChart({
         title: {
-            text: `${title} - ${roomName}`
+            text: title
         },
         axisY: {
             title: title,
@@ -252,7 +166,7 @@ function drawLinePlot(title, options, unit) {
             interval: 1
         },
         data: [{
-            type: "line",
+            type: "line", // Try changing to column, area
             toolTipContent: "{y} " + unit,
             dataPoints: options
         }]
