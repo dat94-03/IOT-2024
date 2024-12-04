@@ -9,7 +9,6 @@ const getDeviceData = async (req, res) => {
 
         const resultx = await DeviceData.find({
             deviceId: deviceId,
-            name: { $in: ['temperature', 'humidity'] }
         }).sort({timestamp: -1}).limit(10);
 
         console.log("Found data:", resultx); // Debug

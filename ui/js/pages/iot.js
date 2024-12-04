@@ -62,9 +62,9 @@ function renderTemperature(thispage) {
     const token = localStorage.getItem("token");
     const baseUrl = BASE_URL;
     // const roomId = $("#roomListing :selected").val();
-    const roomId ='62ce96c7cd95012e5f7155e1'
+    const roomId ='62ce96c7cd95012e5f7155e2'
     // const deviceId = localStorage.getItem(`${roomId}_temperature_sensors`);
-    const deviceId='640ee2c0246bf48329d6deb1'
+    const deviceId='640ee2c0246bf48329d6deb2'
 
     $('.page__content').remove();
     thispage.insertAfter('.page__header');

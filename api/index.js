@@ -50,7 +50,7 @@ app.use('/api/auth', userRouter);
 app.use('/api/room', authenticationMiddleware, roomRouter);
 app.use('/api/device', authenticationMiddleware, deviceRouter);
 app.use('/api/devicetype', deviceTypeRouter);
-app.use('/api/data', authenticationMiddleware, deviceDataRouter);
+app.use('/api/data', deviceDataRouter);
 
 // Swagger API documentation route
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swagger));
