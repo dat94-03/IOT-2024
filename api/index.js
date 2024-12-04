@@ -10,6 +10,7 @@ const roomRouter = require('./routes/room.route');
 const deviceRouter = require('./routes/device.route');
 const deviceTypeRouter = require('./routes/devicetype.route');
 const deviceDataRouter = require('./routes/devicedata.route');
+const deviceMappingRouter = require('./routes/device_mapping.route');
 
 const authenticationMiddleware = require('./middlewares/authentication');
 const notFoundMiddleware = require('./middlewares/notfound.middleware');
@@ -51,6 +52,7 @@ app.use('/api/room', authenticationMiddleware, roomRouter);
 app.use('/api/device', authenticationMiddleware, deviceRouter);
 app.use('/api/devicetype', deviceTypeRouter);
 app.use('/api/data', deviceDataRouter);
+app.use('/api/device-mapping', deviceMappingRouter);
 
 // Swagger API documentation route
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swagger));
