@@ -8,8 +8,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const chartTypeSelect = document.getElementById('chartTypeSelect');
 
     roomSelect.addEventListener('change', function () {
-        const deviceId = roomSelect.value;
-        fetchDataAndDrawChart(deviceId);
+        const deviceId = this.value;
+        if (deviceId) {
+            fetchDataAndDrawChart(deviceId);
+        }
     });
 
     chartTypeSelect.addEventListener('change', function () {
@@ -88,4 +90,72 @@ document.addEventListener('DOMContentLoaded', function () {
     if (roomSelect.value) {
         fetchDataAndDrawChart(roomSelect.value);
     }
+
+    // Thêm function mới
+    async function loadRoomMappings() {
+        try {
+            const response = await fetch(baseUrl + '/api/device-mapping/all');
+            const data = await response.json();
+            
+            const roomSelect = document.getElementById('roomSelect');
+            roomSelect.innerHTML = '<option value="">Chọn phòng</option>';
+            
+            if (data.mappings && data.mappings.length > 0) {
+                data.mappings.forEach(mapping => {
+                    const option = document.createElement('option');
+                    option.value = mapping.deviceId;
+                    option.textContent = mapping.roomName;
+                    roomSelect.appendChild(option);
+                });
+            }
+        } catch (error) {
+            console.error('Lỗi khi tải danh sách phòng:', error);
+        }
+    }
+
+    // Sửa lại phần xử lý form thêm thiết bị
+    document.getElementById('deviceMappingForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const deviceId = document.getElementById('deviceId').value;
+        const roomName = document.getElementById('roomName').value;
+        const messageDiv = document.getElementById('mappingMessage');
+
+        try {
+            const response = await fetch(baseUrl + '/api/device-mapping/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ deviceId, roomName })
+            });
+
+            const data = await response.json();
+            
+            if (response.ok) {
+                messageDiv.className = 'message success';
+                messageDiv.textContent = 'Thêm thiết bị thành công!';
+                document.getElementById('deviceId').value = '';
+                // Tải lại danh sách phòng sau khi thêm thành công
+                loadRoomMappings();
+            } else {
+                messageDiv.className = 'message error';
+                messageDiv.textContent = data.err || 'Có lỗi xảy ra';
+            }
+        } catch (error) {
+            messageDiv.className = 'message error';
+            messageDiv.textContent = 'Lỗi kết nối server';
+        }
+    });
+
+    // Thêm vào phần document.addEventListener('DOMContentLoaded', ...)
+    loadRoomMappings();
+    
+    // Thêm event listener cho nút refresh
+    document.getElementById('refreshBtn').addEventListener('click', () => {
+        loadRoomMappings();
+        const deviceId = roomSelect.value;
+        if (deviceId) {
+            fetchDataAndDrawChart(deviceId);
+        }
+    });
 });

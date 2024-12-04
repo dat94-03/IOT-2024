@@ -134,4 +134,59 @@ canvas {
     border-radius: 4px;
     border: 1px solid #ddd;
     background-color: white;
+}
+
+.device-mapping-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.device-mapping-form {
+    max-width: 400px;
+}
+
+.device-mapping-form .form-group {
+    margin-bottom: 15px;
+}
+
+.device-mapping-form label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.device-mapping-form input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.device-mapping-form input:focus {
+    outline: none;
+    border-color: #006B4E;
+    box-shadow: 0 0 0 2px rgba(0,107,78,0.1);
+}
+
+.device-mapping-form input::placeholder {
+    color: #999;
+}
+
+.message {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.message.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.message.error {
+    background-color: #f8d7da;
+    color: #721c24;
 } 
