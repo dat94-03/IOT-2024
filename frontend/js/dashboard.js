@@ -19,6 +19,44 @@ document.addEventListener('DOMContentLoaded', function () {
         fetchDataAndDrawChart(deviceId);
     });
 
+    let lastTemperature = null;
+    let lastTempCheckTime = null;
+    const tempThreshold = 10; // Ngưỡng thay đổi nhiệt độ (độ C)
+    const tempCheckInterval = 5 * 60 * 1000; // 5 phút
+    const gasThreshold = 1; // Ngưỡng gas
+
+    // Thêm hàm kiểm tra nhiệt độ
+    function checkTemperatureChange(currentTemp, roomName) {
+        const now = Date.now();
+        
+        if (lastTemperature !== null && lastTempCheckTime !== null) {
+            const tempDiff = Math.abs(currentTemp - lastTemperature);
+            const timeDiff = now - lastTempCheckTime;
+            
+            if (tempDiff >= tempThreshold && timeDiff <= tempCheckInterval) {
+                const tempAlert = document.getElementById('tempAlert');
+                tempAlert.style.display = 'flex';
+                tempAlert.querySelector('.alert-message').textContent = 
+                    `Cảnh báo: Nhiệt độ tại ${roomName} thay đổi ${tempDiff.toFixed(1)}°C trong ${(timeDiff/1000/60).toFixed(1)} phút!`;
+            }
+        }
+        
+        lastTemperature = currentTemp;
+        lastTempCheckTime = now;
+    }
+
+    // Thêm hàm kiểm tra ngưỡng nhiệt độ
+    function checkTemperatureThreshold(temperature, roomName) {
+        if (temperature > 25 || temperature < 20) {
+            const tempThresholdAlert = document.getElementById('tempThresholdAlert');
+            tempThresholdAlert.style.display = 'flex';
+            const message = temperature > 25 
+                ? `Cảnh báo: Nhiệt độ tại ${roomName} quá cao (${temperature}°C)!`
+                : `Cảnh báo: Nhiệt độ tại ${roomName} quá thấp (${temperature}°C)!`;
+            tempThresholdAlert.querySelector('.alert-message').textContent = message;
+        }
+    }
+
     function fetchDataAndDrawChart(deviceId) {
         fetch(baseUrl + '/api/data', {
             method: 'POST',
@@ -30,8 +68,30 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data);
             if (data && data.result && Array.isArray(data.result)) {
+                const latestData = data.result[0];
+                if (latestData) {
+                    // Cập nhật giá trị hiển thị
+                    document.getElementById('tempValue').textContent = `${latestData.temperature}°C`;
+                    document.getElementById('humidValue').textContent = `${latestData.humidity}%`;
+                    document.getElementById('gasValue').textContent = `${latestData.gasLevel}`;
+
+                    // Kiểm tra nhiệt độ
+                    const selectedRoom = roomSelect.options[roomSelect.selectedIndex].text;
+                    checkTemperatureChange(latestData.temperature, selectedRoom);
+
+                    // Thêm kiểm tra ngưỡng nhiệt độ
+                    checkTemperatureThreshold(latestData.temperature, selectedRoom);
+
+                    // Kiểm tra gas
+                    const gasAlert = document.getElementById('gasAlert');
+                    if (latestData.gasLevel > gasThreshold) {
+                        gasAlert.style.display = 'flex';
+                    } else {
+                        gasAlert.style.display = 'none';
+                    }
+                }
+
                 const chartType = chartTypeSelect.value;
                 const options = data.result.map(res => {
                     if (res && res.timestamp) {
@@ -158,4 +218,56 @@ document.addEventListener('DOMContentLoaded', function () {
             fetchDataAndDrawChart(deviceId);
         }
     });
+
+    // Thêm xử lý nút tắt còi
+    document.getElementById('stopBuzzerBtn').addEventListener('click', () => {
+        try {
+            const clientId = 'mqttjs_' + Math.random().toString(16).substr(2, 8);
+            const options = {
+                clientId: clientId,
+                username: 'AnhDuc',
+                password: 'DucIot2024',
+                clean: true,
+                connectTimeout: 4000,
+                reconnectPeriod: 1000,
+                // Xóa protocol: 'wss' vì đã được chỉ định trong URL
+            };
+    
+            // Sửa URL kết nối để sử dụng port 8884 thay vì 8883
+            const client = mqtt.connect('wss://d2d60be70c7847508b58bd5018279da5.s1.eu.hivemq.cloud:8884/mqtt', options);
+
+            client.on('connect', () => {
+                console.log('Kết nối MQTT thành công');
+                // Sửa lại message thành "off buzzer" trực tiếp
+                client.publish('iot_hust/command', 'off buzzer', 
+                    { qos: 0, retain: false }, 
+                    (error) => {
+                        if (error) {
+                            console.error('Lỗi khi gửi lệnh:', error);
+                            alert('Có lỗi xảy ra khi gửi lệnh tắt còi!');
+                        } else {
+                            alert('Đã gửi lệnh tắt còi báo động!');
+                        }
+                        client.end();
+                    }
+                );
+            });
+            client.on('error', (error) => {
+                console.error('Lỗi kết nối MQTT:', error);
+                alert('Có lỗi xảy ra khi kết nối MQTT!');
+                client.end();
+            });
+
+            client.on('close', () => {
+                console.log('Đã đóng kết nối MQTT');
+            });
+
+        } catch (error) {
+            console.error('Lỗi:', error);
+            alert('Có lỗi xảy ra!');
+        }
+    });
+    
+   
+
 });

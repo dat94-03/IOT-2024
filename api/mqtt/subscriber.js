@@ -38,6 +38,11 @@ const addOneData = async (data) => {
 
 const addDatas = async (topic, message) => {
     try {
+        if (topic === process.env.TOPIC1) {
+            console.log('Received command:', message.toString());
+            return;
+        }
+
         const msgJson = JSON.parse(message.toString());
         console.log(`Received message on ${topic}:`, msgJson);
         

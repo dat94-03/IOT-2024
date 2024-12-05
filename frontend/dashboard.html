@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/dashboard.css">
     <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js"></script>
 </head>
 <body>
     <div class="sidebar">
@@ -26,7 +27,7 @@
 
     <div class="main-content">
         <header>
-            <h1>Hệ thống giám sát nhà từ xa</h1>
+            <h1>Hệ thống giám sát nhà t��� xa</h1>
             <div class="user-info">
                 <span id="userName"></span>
                 <button id="logoutBtn">Đăng xuất</button>
@@ -65,6 +66,25 @@
             <div class="stat-item">
                 <h3>Độ ẩm:</h3>
                 <span id="humidValue">--%</span>
+            </div>
+            <div class="stat-item">
+                <h3>Nồng độ khí gas:</h3>
+                <span id="gasValue">--</span>
+            </div>
+        </div>
+        
+        <div class="alerts-section">
+            <div id="tempThresholdAlert" class="alert" style="display: none;">
+                <span class="alert-message">Cảnh báo: Nhiệt độ bất thường!</span>
+            </div>
+            
+            <div id="tempAlert" class="alert" style="display: none;">
+                <span class="alert-message">Cảnh báo: Nhiệt độ thay đổi đột ngột!</span>
+            </div>
+            
+            <div id="gasAlert" class="alert" style="display: none;">
+                <span class="alert-message">Cảnh báo: Nồng độ khí gas cao!</span>
+                <button id="stopBuzzerBtn" class="alert-button">Tắt còi báo động</button>
             </div>
         </div>
 
