@@ -34,11 +34,8 @@ async function fetchRooms() {
                 if (confirm('Bạn có chắc chắn muốn xóa phòng này?')) {
                     try {
                         // Gửi yêu cầu DELETE đến server để xóa phòng
-                        const response = await fetch(baseUrl + `/api/device-mapping/delete/${room.deviceId}`, {
+                        const response = await fetch(baseUrl + `/api/device-mapping/remove/${room.deviceId}`, {
                             method: 'DELETE',
-                            headers: {
-                                'Authorization': `Bearer ${token}`, // Nếu cần token bảo mật
-                            },
                         });
 
                         if (response.ok) {

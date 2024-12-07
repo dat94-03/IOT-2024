@@ -68,9 +68,24 @@ const updateMapping = async (req, res) => {
         return res.status(400).json({err: err.toString()});
     }
 }
+const removeDeviceMapping = async (req, res) => {
+    try {
+        const deviceId = req.params.deviceId;
+        const result = await DeviceMapping.findOneAndDelete({
+            deviceId:deviceId,
+        });
+        if (!result) {
+            throw new NotFoundError(`No device with id ${deviceId}`);
+        } 
+        return res.status(200).json({"message": "Delete success"});
+    } catch (err) {
+        return res.status(400).json({"err": err.toString()});
+    }
+}
 
 module.exports = {
     addDeviceMapping,
     getAllMappings,
-    updateMapping
+    updateMapping,
+    removeDeviceMapping
 }; 
