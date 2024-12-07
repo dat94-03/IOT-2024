@@ -9,7 +9,7 @@ const getDeviceData = async (req, res) => {
 
         const resultx = await DeviceData.find({
             deviceId: deviceId,
-        }).sort({timestamp: -1}).limit(10);
+        }).sort({timestamp: -1}).limit(50);
 
         console.log("Found data:", resultx); // Debug
 

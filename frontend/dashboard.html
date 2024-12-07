@@ -10,28 +10,23 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js"></script>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="menu-item active">
-            <!-- <img src="icons/overview.png" alt="Tổng quan"> -->
-            <span>Tổng quan</span>
-        </div>
-        <div class="menu-item">
-            <!-- <img src="icons/temperature.png" alt="Nhiệt độ"> -->
-            <span>Nhiệt độ</span>
-        </div>
-        <div class="menu-item">
-            <!-- <img src="icons/humidity.png" alt="Độ ẩm"> -->
-            <span>Độ ẩm</span>
-        </div>
-    </div>
+    
 
     <div class="main-content">
-        <header>
-            <h1>Hệ thống giám sát nhà t��� xa</h1>
+        
+        <div class="header-actions">
+            <div class="back-button-container">
+                <button id="backBtn" class="back-button" style="pointer-events: auto;">Trở lại</button>
+            </div>
             <div class="user-info">
                 <span id="userName"></span>
-                <button id="logoutBtn">Đăng xuất</button>
+                <button id="logoutBtn" class="logout-button">Đăng xuất</button>
             </div>
+        </div>
+        
+        <header>
+            <h1>Hệ thống giám sát nhà từ xa</h1>
+            
         </header>
 
         <div class="room-control">

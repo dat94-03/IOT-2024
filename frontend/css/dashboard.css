@@ -1,3 +1,4 @@
+/* Cấu trúc chung */
 * {
     margin: 0;
     padding: 0;
@@ -5,14 +6,50 @@
 }
 
 body {
+    background-image: linear-gradient(240deg, #fbc2eb 0%, #a6c9ee 100%);
     display: flex;
     font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
+    /* background-color: #e5e8f4; Xanh dương nhạt */
 }
 
+/* Header Actions */
+.header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    color: white;
+    border-bottom: 1px solid #1976d2;
+}
+
+.back-button-container,
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.back-button,
+.logout-button {
+    background-color: #1976d2; /* Màu xanh dương */
+    color: white;
+    border: none;
+    padding: 6px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-right: 10px;
+}
+
+.back-button:hover,
+.logout-button:hover {
+    background-color: #0d47a1; /* Xanh dương đậm hơn khi hover */
+}
+
+/* Sidebar */
 .sidebar {
     width: 200px;
-    background-color: #006B4E;
+    background-color: #1565c0; /* Xanh dương đậm */
     color: white;
     padding: 20px 0;
     height: 100vh;
@@ -24,6 +61,7 @@ body {
     display: flex;
     align-items: center;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 .menu-item img {
@@ -32,15 +70,22 @@ body {
 }
 
 .menu-item.active {
-    background-color: #005540;
+    background-color: #0d47a1; /* Xanh dương đậm hơn */
 }
 
+.menu-item:hover {
+    background-color: #1e88e5;
+}
+
+/* Main Content */
 .main-content {
-    margin-left: 200px;
+    margin: auto;
     padding: 20px;
-    width: calc(100% - 200px);
+    width: 80%;
+    /* align-self: center; */
 }
 
+/* Header */
 header {
     display: flex;
     justify-content: space-between;
@@ -48,6 +93,11 @@ header {
     margin-bottom: 30px;
 }
 
+header h1 {
+    color: #1565c0;
+}
+
+/* Room Control */
 .room-control {
     display: flex;
     gap: 10px;
@@ -61,12 +111,17 @@ select, button {
 }
 
 button {
-    background-color: #006B4E;
+    background-color: #1565c0;
     color: white;
     border: none;
     cursor: pointer;
 }
 
+button:hover {
+    background-color: #0d47a1;
+}
+
+/* Light Controls */
 .light-controls {
     display: flex;
     gap: 20px;
@@ -83,21 +138,21 @@ button {
     padding: 8px 15px;
     border-radius: 4px;
     border: 1px solid #ddd;
-    background-color: #006B4E;
+    background-color: #1565c0;
     color: white;
-    border: none;
     cursor: pointer;
 }
 
 .light-btn.active {
-    background-color: #005540;
+    background-color: #0d47a1;
 }
 
 .light-btn.off {
     background-color: #ddd;
-    color: #006B4E;
+    color: #1565c0;
 }
 
+/* Sensors Container */
 .sensors-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -115,20 +170,20 @@ button {
     font-size: 2em;
     text-align: center;
     margin: 10px 0;
+    color: #1565c0;
 }
 
-canvas {
-    width: 100% !important;
-    height: 200px !important;
-}
-
+/* Chart Controls */
 .chart-controls {
     margin-bottom: 20px;
     display: flex;
     gap: 10px;
     align-items: center;
+    
 }
-
+.sensor-chart{
+    border-radius: 100px;   
+}
 .chart-controls select {
     padding: 8px 15px;
     border-radius: 4px;
@@ -136,6 +191,7 @@ canvas {
     background-color: white;
 }
 
+/* Device Mapping Section */
 .device-mapping-section {
     background: white;
     padding: 20px;
@@ -155,6 +211,7 @@ canvas {
 .device-mapping-form label {
     display: block;
     margin-bottom: 5px;
+    color: #1565c0;
 }
 
 .device-mapping-form input {
@@ -167,30 +224,11 @@ canvas {
 
 .device-mapping-form input:focus {
     outline: none;
-    border-color: #006B4E;
-    box-shadow: 0 0 0 2px rgba(0,107,78,0.1);
+    border-color: #1565c0;
+    box-shadow: 0 0 0 2px rgba(21, 101, 192, 0.1);
 }
 
-.device-mapping-form input::placeholder {
-    color: #999;
-}
-
-.message {
-    margin-top: 10px;
-    padding: 10px;
-    border-radius: 4px;
-}
-
-.message.success {
-    background-color: #d4edda;
-    color: #155724;
-}
-
-.message.error {
-    background-color: #f8d7da;
-    color: #721c24;
-}
-
+/* Alerts Section */
 .alerts-section {
     margin-bottom: 20px;
 }
@@ -216,9 +254,10 @@ canvas {
     color: #721c24;
 }
 
+/* Alert Button */
 .alert-button {
     padding: 8px 15px;
-    background-color: #dc3545;
+    background-color: #1976d2;
     color: white;
     border: none;
     border-radius: 4px;
@@ -227,25 +266,5 @@ canvas {
 }
 
 .alert-button:hover {
-    background-color: #c82333;
-} 
-
-.alert {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    margin: 10px 0;
-    background-color: #ffebee;
-    border: 1px solid #ef5350;
-    border-radius: 4px;
-    color: #c62828;
-}
-
-.close-btn {
-    background: none;
-    border: none;
-    color: #c62828;
-    font-size: 20px;
-    cursor: pointer;
+    background-color: #0d47a1;
 }

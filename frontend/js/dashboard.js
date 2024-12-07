@@ -1,21 +1,22 @@
 document.addEventListener('DOMContentLoaded', function () {
     const token = localStorage.getItem('token');
     const baseUrl = 'http://localhost:3000';
-    const roomSelect = document.getElementById('roomSelect');
+    // const roomSelect = document.getElementById('roomSelect');
+    const urlParams = new URLSearchParams(window.location.search);
+    const deviceId = urlParams.get('deviceId');
     const sensorChart = document.getElementById('sensorChart');
     let chart;
-
+    fetchDataAndDrawChart(deviceId);
     const chartTypeSelect = document.getElementById('chartTypeSelect');
 
-    roomSelect.addEventListener('change', function () {
-        const deviceId = this.value;
-        if (deviceId) {
-            fetchDataAndDrawChart(deviceId);
-        }
-    });
+    // roomSelect.addEventListener('change', function () {
+    //     const deviceId = this.value;
+    //     if (deviceId) {
+    //         fetchDataAndDrawChart(deviceId);
+    //     }
+    // });
 
     chartTypeSelect.addEventListener('change', function () {
-        const deviceId = roomSelect.value;
         fetchDataAndDrawChart(deviceId);
     });
 
@@ -26,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const gasThreshold = 1; // Ngưỡng gas
 
     // Thêm hàm kiểm tra nhiệt độ
-    function checkTemperatureChange(currentTemp, roomName) {
+    function checkTemperatureChange(currentTemp) {
         const now = Date.now();
         
         if (lastTemperature !== null && lastTempCheckTime !== null) {
@@ -37,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const tempAlert = document.getElementById('tempAlert');
                 tempAlert.style.display = 'flex';
                 tempAlert.querySelector('.alert-message').textContent = 
-                    `Cảnh báo: Nhiệt độ tại ${roomName} thay đổi ${tempDiff.toFixed(1)}°C trong ${(timeDiff/1000/60).toFixed(1)} phút!`;
+                    `Cảnh báo: Nhiệt độ thay đổi ${tempDiff.toFixed(1)}°C trong ${(timeDiff/1000/60).toFixed(1)} phút!`;
             }
         }
         
@@ -46,18 +47,29 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Thêm hàm kiểm tra ngưỡng nhiệt độ
-    function checkTemperatureThreshold(temperature, roomName) {
+    function checkTemperatureThreshold(temperature) {
         if (temperature > 25 || temperature < 20) {
             const tempThresholdAlert = document.getElementById('tempThresholdAlert');
             tempThresholdAlert.style.display = 'flex';
             const message = temperature > 25 
-                ? `Cảnh báo: Nhiệt độ tại ${roomName} quá cao (${temperature}°C)!`
-                : `Cảnh báo: Nhiệt độ tại ${roomName} quá thấp (${temperature}°C)!`;
+                ? `Cảnh báo: Nhiệt độ quá cao (${temperature}°C)!`
+                : `Cảnh báo: Nhiệt độ quá thấp (${temperature}°C)!`;
             tempThresholdAlert.querySelector('.alert-message').textContent = message;
         }
     }
 
+   
+    
+    document.getElementById('backBtn').addEventListener('click', () => {
+
+            window.location.href = '/frontend/roomList.html';
+    
+    });
+
+    
+
     function fetchDataAndDrawChart(deviceId) {
+        console.log('Device ID gửi tới API:', deviceId);
         fetch(baseUrl + '/api/data', {
             method: 'POST',
             headers: {
@@ -68,6 +80,7 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .then(response => response.json())
         .then(data => {
+            console.log(data)
             if (data && data.result && Array.isArray(data.result)) {
                 const latestData = data.result[0];
                 if (latestData) {
@@ -77,11 +90,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     document.getElementById('gasValue').textContent = `${latestData.gasLevel}`;
 
                     // Kiểm tra nhiệt độ
-                    const selectedRoom = roomSelect.options[roomSelect.selectedIndex].text;
-                    checkTemperatureChange(latestData.temperature, selectedRoom);
+                    // const selectedRoom = JSON.stringify(fetchRoomName(deviceId));
+                    
+                    // console.log(`selectedRoom: ${typeof(selectedRoom)}`);
+                    // console.log(`selectedRoom la: ${selectedRoom}`);
+                    checkTemperatureChange(latestData.temperature);
 
                     // Thêm kiểm tra ngưỡng nhiệt độ
-                    checkTemperatureThreshold(latestData.temperature, selectedRoom);
+                    checkTemperatureThreshold(latestData.temperature);
 
                     // Kiểm tra gas
                     const gasAlert = document.getElementById('gasAlert');
@@ -123,97 +139,106 @@ document.addEventListener('DOMContentLoaded', function () {
     function drawLinePlot(title, dataPoints, unit) {
         const labels = dataPoints.map(dp => dp.label);
         const values = dataPoints.map(dp => dp.y);
-
+    
+        const maxY = Math.max(...values); // Tìm giá trị lớn nhất
+        const minY = Math.min(...values); // Tìm giá trị nhỏ nhất
+    
+        const step = Math.ceil(labels.length / 5); // Chọn khoảng cách giữa các nhãn x để chỉ hiển thị 5 nhãn
+        const tickvals = labels.filter((_, index) => index % step === 0); // Lấy các nhãn cách đều
+    
         const trace = {
             x: labels,
             y: values,
             type: 'scatter',
-            mode: 'lines+markers',
-            marker: { color: 'rgba(75, 192, 192, 1)' },
+            mode: 'lines',
+            marker: { 
+                color: '#a6c1ee', // Màu dot
+                size: 6 // Kích thước nhỏ hơn
+            },
+            line: {
+                color: 'rgba(75, 192, 192, 0.8)', // Màu đường
+                width: 2 // Độ dày đường
+            },
             name: title
         };
-
+    
         const layout = {
-            title: title,
+            title: {
+                text: title,
+                font: {
+                    family: 'Arial, sans-serif',
+                    size: 24,
+                    color: '#333'
+                }
+            },
             xaxis: {
-                title: 'Time'
+                title: {
+                    text: 'Time',
+                    font: {
+                        family: 'Arial, sans-serif',
+                        size: 18,
+                        color: '#333'
+                    }
+                },
+                tickmode: 'array',
+                tickvals: tickvals,
+                ticktext: tickvals,
+                tickfont: {
+                    family: 'Arial, sans-serif',
+                    size: 14,
+                    color: '#555'
+                },
+                showgrid: true,
+                gridcolor: '#aaa'
             },
             yaxis: {
-                title: unit
-            }
+                title: {
+                    text: unit,
+                    font: {
+                        family: 'Arial, sans-serif',
+                        size: 18,
+                        color: '#333'
+                    }
+                },
+                range: [minY - 1, maxY + 1],
+                tickfont: {
+                    family: 'Arial, sans-serif',
+                    size: 14,
+                    color: '#555'
+                },
+                showgrid: true,
+                gridcolor: '#aaa'
+            },
+            plot_bgcolor: '#cfdeed',
+            paper_bgcolor: '#cfdeed',
+            margin: {
+                l: 50,
+                r: 30,
+                t: 50,
+                b: 50
+            },
+            hovermode: 'closest'
         };
-
+    
         Plotly.newPlot('sensorChart', [trace], layout);
     }
+    
+    // Đăng xuất khi bấm vào nút "Đăng xuất"
+document.getElementById('logoutBtn').addEventListener('click', function () {
+    // Xóa dữ liệu người dùng (ví dụ: token, session) từ localStorage hoặc sessionStorage
+    localStorage.removeItem('Token');
+    localStorage.removeItem('userName');
+    // Hoặc sessionStorage.removeItem(...) nếu bạn sử dụng sessionStorage
 
-    // Khởi tạo với deviceId đầu tiên
-    if (roomSelect.value) {
-        fetchDataAndDrawChart(roomSelect.value);
-    }
+    // Điều hướng về trang đăng nhập
+    window.location.href = '/frontend/index.html';
+});
 
-    // Thêm function mới
-    async function loadRoomMappings() {
-        try {
-            const response = await fetch(baseUrl + '/api/device-mapping/all');
-            const data = await response.json();
-            
-            const roomSelect = document.getElementById('roomSelect');
-            roomSelect.innerHTML = '<option value="">Chọn phòng</option>';
-            
-            if (data.mappings && data.mappings.length > 0) {
-                data.mappings.forEach(mapping => {
-                    const option = document.createElement('option');
-                    option.value = mapping.deviceId;
-                    option.textContent = mapping.roomName;
-                    roomSelect.appendChild(option);
-                });
-            }
-        } catch (error) {
-            console.error('Lỗi khi tải danh sách phòng:', error);
-        }
-    }
+    
 
-    // Sửa lại phần xử lý form thêm thiết bị
-    document.getElementById('deviceMappingForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const deviceId = document.getElementById('deviceId').value;
-        const roomName = document.getElementById('roomName').value;
-        const messageDiv = document.getElementById('mappingMessage');
-
-        try {
-            const response = await fetch(baseUrl + '/api/device-mapping/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ deviceId, roomName })
-            });
-
-            const data = await response.json();
-            
-            if (response.ok) {
-                messageDiv.className = 'message success';
-                messageDiv.textContent = 'Thêm thiết bị thành công!';
-                document.getElementById('deviceId').value = '';
-                // Tải lại danh sách phòng sau khi thêm thành công
-                loadRoomMappings();
-            } else {
-                messageDiv.className = 'message error';
-                messageDiv.textContent = data.err || 'Có lỗi xảy ra';
-            }
-        } catch (error) {
-            messageDiv.className = 'message error';
-            messageDiv.textContent = 'Lỗi kết nối server';
-        }
-    });
-
-    // Thêm vào phần document.addEventListener('DOMContentLoaded', ...)
-    loadRoomMappings();
     
     // Thêm event listener cho nút refresh
     document.getElementById('refreshBtn').addEventListener('click', () => {
-        loadRoomMappings();
-        const deviceId = roomSelect.value;
         if (deviceId) {
             fetchDataAndDrawChart(deviceId);
         }
