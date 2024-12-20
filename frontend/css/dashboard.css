@@ -268,3 +268,130 @@ button:hover {
 .alert-button:hover {
     background-color: #0d47a1;
 }
+
+.device-info {
+    background-color: #cfdeed; /* Màu giống với chart */
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.info-item {
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    background-color: white; /* Thêm background trắng cho từng item */
+    padding: 10px 15px;
+    border-radius: 6px;
+}
+
+.info-item label {
+    font-weight: bold;
+    margin-right: 10px;
+    min-width: 100px;
+    color: #1565c0; /* Màu xanh đồng bộ với theme */
+}
+
+.info-item span {
+    color: #2c3e50;
+    font-size: 1.1em;
+    font-weight: 500;
+}
+
+.device-mapping-section h2 {
+    color: #1565c0; /* Màu xanh đồng bộ với theme */
+    margin-bottom: 15px;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 0;
+    border-radius: 8px;
+    width: 400px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    animation: slideIn 0.3s ease;
+}
+
+.modal-header {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 15px 20px;
+    border-radius: 8px 8px 0 0;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.4em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-body .alert-message {
+    font-size: 1.1em;
+    margin-bottom: 20px;
+    /* color: #721c24; */
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.modal-actions button {
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.alert-button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+}
+
+.alert-button:hover {
+    background-color: #c82333;
+}
+
+.close-modal {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+}
+
+.close-modal:hover {
+    background-color: #5a6268;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-100px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}

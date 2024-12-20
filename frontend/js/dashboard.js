@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const deviceId = urlParams.get('deviceId');
     const sensorChart = document.getElementById('sensorChart');
     let chart;
+    fetchRoomName(deviceId);
     fetchDataAndDrawChart(deviceId);
     const chartTypeSelect = document.getElementById('chartTypeSelect');
 
@@ -22,9 +23,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let lastTemperature = null;
     let lastTempCheckTime = null;
-    const tempThreshold = 10; // Ngưỡng thay đổi nhiệt độ (độ C)
+    const tempThreshold = {
+        low: 20,     // Ngưỡng nhiệt độ thấp
+        high: 30     // Ngưỡng nhiệt độ cao
+    };
+    const tempChange = 10;
     const tempCheckInterval = 5 * 60 * 1000; // 5 phút
-    const gasThreshold = 1; // Ngưỡng gas
+    const gasThreshold = {
+        warning: 20,  // Ngưỡng cảnh báo
+        danger: 30 // Ngưỡng nguy hiểm
+    };
 
     // Thêm hàm kiểm tra nhiệt độ
     function checkTemperatureChange(currentTemp) {
@@ -34,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const tempDiff = Math.abs(currentTemp - lastTemperature);
             const timeDiff = now - lastTempCheckTime;
             
-            if (tempDiff >= tempThreshold && timeDiff <= tempCheckInterval) {
+            if (tempDiff >= tempChange && timeDiff <= tempCheckInterval) {
                 const tempAlert = document.getElementById('tempAlert');
                 tempAlert.style.display = 'flex';
                 tempAlert.querySelector('.alert-message').textContent = 
@@ -46,16 +54,44 @@ document.addEventListener('DOMContentLoaded', function () {
         lastTempCheckTime = now;
     }
 
-    // Thêm hàm kiểm tra ngưỡng nhiệt độ
+    // Hàm kiểm tra ngưỡng nhiệt độ
     function checkTemperatureThreshold(temperature) {
-        if (temperature > 25 || temperature < 20) {
-            const tempThresholdAlert = document.getElementById('tempThresholdAlert');
-            tempThresholdAlert.style.display = 'flex';
-            const message = temperature > 25 
-                ? `Cảnh báo: Nhiệt độ quá cao (${temperature}°C)!`
-                : `Cảnh báo: Nhiệt độ quá thấp (${temperature}°C)!`;
-            tempThresholdAlert.querySelector('.alert-message').textContent = message;
+        const tempAlertModal = document.getElementById('tempAlertModal');
+        const alertMessage = tempAlertModal.querySelector('.alert-message');
+        
+        if (temperature > tempThreshold.high) {
+            tempAlertModal.style.display = 'block';
+            alertMessage.textContent = `Cảnh báo: Nhiệt độ quá cao (${temperature}°C)!`;
+            alertMessage.style.color = '#721c24'; // Màu đỏ cho nhiệt độ cao
+            tempAlertModal.querySelector('.modal-header').className = 'modal-header danger';
+            return true;
+        } else if (temperature < tempThreshold.low) {
+            tempAlertModal.style.display = 'block';
+            alertMessage.textContent = `Cảnh báo: Nhiệt độ quá thấp (${temperature}°C)!`;
+            alertMessage.style.color = '#856404'; // Màu vàng cho nhiệt độ thấp
+            tempAlertModal.querySelector('.modal-header').className = 'modal-header warning';
+            return true;
         }
+        return false;
+    }
+
+    // Thêm hàm kiểm tra ngưỡng khí gas
+    function checkGasThreshold(gasLevel) {
+        const gasAlertModal = document.getElementById('gasAlertModal');
+        const alertMessage = gasAlertModal.querySelector('.alert-message');
+        
+        if (gasLevel > gasThreshold.danger) {
+            gasAlertModal.style.display = 'block';
+            alertMessage.textContent = `Cảnh báo: Nồng độ khí gas rất cao (${gasLevel})! Nguy hiểm!`;
+            alertMessage.style.color = '#721c24'; // Màu đỏ cho mức nguy hiểm
+            return true;
+        } else if (gasLevel > gasThreshold.warning) {
+            gasAlertModal.style.display = 'block';
+            alertMessage.textContent = `Cảnh báo: Nồng độ khí gas cao (${gasLevel})!`;
+            alertMessage.style.color = '#856404'; // Màu vàng cho mức cảnh báo
+            return true;
+        }
+        return false;
     }
 
    
@@ -69,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
 
     function fetchDataAndDrawChart(deviceId) {
-        console.log('Device ID gửi tới API:', deviceId);
+        // console.log('Device ID gửi tới API:', deviceId);
         fetch(baseUrl + '/api/data', {
             method: 'POST',
             headers: {
@@ -80,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data)
+            // console.log(data)
             if (data && data.result && Array.isArray(data.result)) {
                 const latestData = data.result[0];
                 if (latestData) {
@@ -88,6 +124,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     document.getElementById('tempValue').textContent = `${latestData.temperature}°C`;
                     document.getElementById('humidValue').textContent = `${latestData.humidity}%`;
                     document.getElementById('gasValue').textContent = `${latestData.gasLevel}`;
+
+                    // Kiểm tra các ngưỡng
+                    const isTempAbnormal = checkTemperatureThreshold(latestData.temperature);
+                    const isGasHigh = checkGasThreshold(latestData.gasLevel);
+                    
+                    // Ẩn các modal nếu giá trị trở về bình thường
+                    if (!isTempAbnormal) {
+                        tempAlertModal.style.display = 'none';
+                    }
+                    if (!isGasHigh) {
+                        gasAlertModal.style.display = 'none';
+                    }
 
                     // Kiểm tra nhiệt độ
                     // const selectedRoom = JSON.stringify(fetchRoomName(deviceId));
@@ -98,14 +146,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // Thêm kiểm tra ngưỡng nhiệt độ
                     checkTemperatureThreshold(latestData.temperature);
-
-                    // Kiểm tra gas
-                    const gasAlert = document.getElementById('gasAlert');
-                    if (latestData.gasLevel > gasThreshold) {
-                        gasAlert.style.display = 'flex';
-                    } else {
-                        gasAlert.style.display = 'none';
-                    }
                 }
 
                 const chartType = chartTypeSelect.value;
@@ -244,55 +284,182 @@ document.getElementById('logoutBtn').addEventListener('click', function () {
         }
     });
 
-    // Thêm xử lý nút tắt còi
-    document.getElementById('stopBuzzerBtn').addEventListener('click', () => {
+    // Xử lý tắt còi báo động
+    document.getElementById('stopBuzzerBtn').addEventListener('click', async () => {
+        console.log('Stopping buzzer - button clicked');
+        gasAlertModal.style.display = 'none';
+
         try {
             const clientId = 'mqttjs_' + Math.random().toString(16).substr(2, 8);
-            const options = {
+            console.log('Connecting to MQTT with clientId:', clientId);
+
+            const client = mqtt.connect('wss://d2d60be70c7847508b58bd5018279da5.s1.eu.hivemq.cloud:8884/mqtt', {
                 clientId: clientId,
                 username: 'AnhDuc',
                 password: 'DucIot2024',
                 clean: true,
                 connectTimeout: 4000,
                 reconnectPeriod: 1000,
-                // Xóa protocol: 'wss' vì đã được chỉ định trong URL
-            };
-    
-            // Sửa URL kết nối để sử dụng port 8884 thay vì 8883
-            const client = mqtt.connect('wss://d2d60be70c7847508b58bd5018279da5.s1.eu.hivemq.cloud:8884/mqtt', options);
+            });
 
             client.on('connect', () => {
-                console.log('Kết nối MQTT thành công');
-                // Sửa lại message thành "off buzzer" trực tiếp
-                client.publish('iot_hust/command', 'off buzzer', 
-                    { qos: 0, retain: false }, 
+                console.log('MQTT Connected successfully');
+                
+                // Gửi lệnh tắt còi
+                const command = 'off buzzer';
+                console.log('Publishing command:', command);
+                
+                client.publish('iot_hust/command', command, { qos: 0, retain: false }, 
                     (error) => {
                         if (error) {
-                            console.error('Lỗi khi gửi lệnh:', error);
+                            console.error('MQTT Publish error:', error);
                             alert('Có lỗi xảy ra khi gửi lệnh tắt còi!');
+                            gasAlertModal.style.display = 'block';
                         } else {
-                            alert('Đã gửi lệnh tắt còi báo động!');
+                            console.log('MQTT Command sent successfully');
+                            setTimeout(() => {
+                                fetchDataAndDrawChart(deviceId);
+                            }, 2000);
                         }
-                        client.end();
+                        client.end(() => {
+                            console.log('MQTT Connection closed');
+                        });
                     }
                 );
             });
+
             client.on('error', (error) => {
-                console.error('Lỗi kết nối MQTT:', error);
+                console.error('MQTT Connection error:', error);
                 alert('Có lỗi xảy ra khi kết nối MQTT!');
+                gasAlertModal.style.display = 'block';
                 client.end();
             });
 
             client.on('close', () => {
-                console.log('Đã đóng kết nối MQTT');
+                console.log('MQTT Connection closed');
             });
 
         } catch (error) {
-            console.error('Lỗi:', error);
+            console.error('Error in stopBuzzer function:', error);
             alert('Có lỗi xảy ra!');
+            gasAlertModal.style.display = 'block';
         }
     });
-    
-   
 
+    // Xử lý đóng modal
+    const closeModalBtn = document.querySelector('.close-modal');
+    const gasAlertModal = document.getElementById('gasAlertModal');
+
+    closeModalBtn.addEventListener('click', () => {
+        gasAlertModal.style.display = 'none';
+    });
+
+    // Đóng modal khi click bên ngoài
+    window.addEventListener('click', (event) => {
+        if (event.target === gasAlertModal) {
+            gasAlertModal.style.display = 'none';
+        }
+    });
+
+    // Thêm interval để kiểm tra định kỳ
+    const checkInterval = setInterval(() => {
+        if (deviceId) {
+            fetchDataAndDrawChart(deviceId);
+        }
+    }, 5000); // Kiểm tra mỗi 5 giây
+
+    // Cleanup interval khi component unmount
+    window.addEventListener('beforeunload', () => {
+        clearInterval(checkInterval);
+    });
+    
+    function fetchRoomName(deviceId) {
+        console.log('Fetching room name for device:', deviceId);
+        
+        // Cập nhật Device ID ngay lập tức
+        document.getElementById('currentDeviceId').textContent = deviceId;
+        
+        fetch(`${baseUrl}/api/device-mapping/all`, {
+            method: 'GET',
+            headers: {
+                'authorization': token,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.mappings) {
+                // Tìm thiết bị có deviceId tương ứng
+                const device = data.mappings.find(mapping => mapping.deviceId === deviceId);
+                
+                if (device) {
+                    // Cập nhật tiêu đề với tên phòng
+                    const header = document.querySelector('header h1');
+                    header.textContent = `Hệ thống giám sát nhà từ xa - ${device.roomName}`;
+                    
+                    // Cập nhật thông tin phòng trong phần device info
+                    document.getElementById('currentRoomName').textContent = device.roomName;
+                } else {
+                    console.log('Device not found in mappings');
+                    const header = document.querySelector('header h1');
+                    header.textContent = `Hệ thống giám sát nhà từ xa - Unknown Room`;
+                    document.getElementById('currentRoomName').textContent = 'Unknown Room';
+                }
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching mappings:", error);
+            const header = document.querySelector('header h1');
+            header.textContent = `Hệ thống giám sát nhà từ xa - Unknown Room`;
+            document.getElementById('currentRoomName').textContent = 'Unknown Room';
+        });
+    }
+   
+    
 });
+
+// Cập nhật style cho modal để phân biệt các mức cảnh báo
+const styleSheet = document.createElement('style');
+styleSheet.textContent = `
+    .modal-header.warning {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    
+    .modal-header.danger {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .alert-message.warning {
+        color: #856404;
+    }
+    
+    .alert-message.danger {
+        color: #721c24;
+    }
+
+    .modal-actions button {
+        padding: 8px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        border: none;
+        margin-left: 10px;
+    }
+
+    .close-modal-temp {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .close-modal-temp:hover {
+        background-color: #5a6268;
+    }
+`;
+document.head.appendChild(styleSheet);
