@@ -54,43 +54,30 @@ const getAllMappings = async (req, res) => {
     }
 }
 
-const updateMapping = async (req, res) => {
-    try {
-        const { deviceId, roomName } = req.body;
-        
-        if (!deviceId || !roomName) {
-            return res.status(400).json({
-                err: 'Vui lòng điền đầy đủ thông tin'
-            });
-        }
-
-        const result = await DeviceMapping.findOneAndUpdate(
-            { deviceId },
-            { roomName: roomName.trim() },
-            { new: true, runValidators: true }
-        );
-
-        if (!result) {
-            return res.status(404).json({
-                err: 'Không tìm thấy thiết bị'
-            });
-        }
-
-        return res.status(StatusCodes.OK).json({ result });
-    } catch (err) {
-        return res.status(400).json({err: err.toString()});
-    }
-}
 const removeDeviceMapping = async (req, res) => {
     try {
         const deviceId = req.params.deviceId;
+        const userId = req.user.userId;
+
+        // Thêm điều kiện userId để đảm bảo chỉ xóa mapping của user hiện tại
         const result = await DeviceMapping.findOneAndDelete({
-            deviceId:deviceId,
+            deviceId: deviceId,
+            userId: userId
         });
+
         if (!result) {
-            throw new NotFoundError(`No device with id ${deviceId}`);
-        } 
-        return res.status(200).json({"message": "Delete success"});
+            return res.status(404).json({
+                err: 'Không tìm thấy thiết bị hoặc bạn không có quyền xóa'
+            });
+        }
+
+        // Cập nhật trạng thái added về false trong AvailableDevice
+        await AvailableDevice.findOneAndUpdate(
+            { deviceId: deviceId },
+            { added: false }
+        );
+
+        return res.status(200).json({"message": "Xóa thành công"});
     } catch (err) {
         return res.status(400).json({"err": err.toString()});
     }
@@ -99,6 +86,5 @@ const removeDeviceMapping = async (req, res) => {
 module.exports = {
     addDeviceMapping,
     getAllMappings,
-    updateMapping,
     removeDeviceMapping
 }; 

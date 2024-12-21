@@ -7,9 +7,8 @@ const DeviceMappingSchema = mongoose.Schema({
         trim: true
     },
     userId: {
-        type: mongoose.Types.ObjectId,
-        required: [true, 'User ID là bắt buộc'],
-        ref: 'User'
+        type: String,
+        required: [true, 'User ID là bắt buộc']
     },
     roomName: {
         type: String,
@@ -22,7 +21,7 @@ const DeviceMappingSchema = mongoose.Schema({
     timestamps: true
 });
 
-// Tạo composite unique index cho deviceId và userId
+// Composite unique index cho deviceId và userId - đảm bảo mỗi user chỉ có thể map một deviceId một lần
 DeviceMappingSchema.index({ deviceId: 1, userId: 1 }, { unique: true });
 
 module.exports = mongoose.model('DeviceMapping', DeviceMappingSchema); 

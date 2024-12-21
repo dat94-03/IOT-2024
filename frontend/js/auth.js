@@ -18,7 +18,8 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         if (response.ok) {
             localStorage.setItem('token', data.token);
             localStorage.setItem('userName', data.user.name);
-            window.location.href = 'roomList.html';
+            localStorage.setItem('userId', data.user.userId);
+            window.location.href = '/frontend/roomList.html';
         } else {
             document.getElementById('error-message').textContent = 
                 data.err || 'Đăng nhập thất bại';

@@ -36,22 +36,26 @@ async function fetchRooms() {
             deleteIcon.onclick = async () => {
                 if (confirm('Bạn có chắc chắn muốn xóa phòng này?')) {
                     try {
-                        // Gửi yêu cầu DELETE đến server để xóa phòng
+                        const token = localStorage.getItem('token');
+                        // Thêm token vào header của request
                         const response = await fetch(baseUrl + `/api/device-mapping/remove/${room.deviceId}`, {
                             method: 'DELETE',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
                         });
 
                         if (response.ok) {
-                            // Xóa phòng khỏi DOM nếu xóa thành công
                             roomElement.remove();
                             alert('Phòng đã được xóa thành công!');
                         } else {
                             const errorData = await response.json();
-                            alert('Lỗi: ' + errorData.message);
+                            alert('Lỗi khi xóa phòng: ' + (errorData.err || 'Không xác định'));
                         }
                     } catch (error) {
-                        console.error('Lỗi khi xóa phòng:', error);
-                        alert('Đã xảy ra lỗi trong quá trình xóa phòng.');
+                        console.error('Error:', error);
+                        alert('Đã xảy ra lỗi khi xóa phòng');
                     }
                 }
             };

@@ -7,7 +7,13 @@ const register = async (req, res) => {
 	try {
 		const user = await User.create({ ...req.body });
 		const token = user.createJWT();
-		res.status(StatusCodes.CREATED).json({ user: { name: user.name }, token });	
+		res.status(StatusCodes.CREATED).json({ 
+			user: { 
+				name: user.name,
+				userId: user.email
+			}, 
+			token 
+		});	
 	} catch (err) {
 		return res.status(400).json({err: err.toString()});
 	}
@@ -32,7 +38,13 @@ const login = async (req, res) => {
 		
 		const token = user.createJWT();
 	
-		return res.status(StatusCodes.OK).json({ user: { name: user.name }, token});
+		return res.status(StatusCodes.OK).json({ 
+			user: { 
+				name: user.name,
+				userId: user.email
+			}, 
+			token
+		});
 	
 	} catch (err) {
 		return res.status(400).json({err: err.toString()});

@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Đăng xuất khi bấm vào nút "Đăng xuất"
 document.getElementById('logoutBtn').addEventListener('click', function () {
-    // Xóa dữ liệu người dùng (ví dụ: token, session) từ localStorage hoặc sessionStorage
+    // Xóa dữ li���u người dùng (ví dụ: token, session) từ localStorage hoặc sessionStorage
     localStorage.removeItem('Token');
     localStorage.removeItem('userName');
     // Hoặc sessionStorage.removeItem(...) nếu bạn sử dụng sessionStorage
@@ -373,7 +373,8 @@ document.getElementById('logoutBtn').addEventListener('click', function () {
     });
     
     function fetchRoomName(deviceId) {
-        console.log('Fetching room name for device:', deviceId);
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('userId');
         
         // Cập nhật Device ID ngay lập tức
         document.getElementById('currentDeviceId').textContent = deviceId;
@@ -381,7 +382,7 @@ document.getElementById('logoutBtn').addEventListener('click', function () {
         fetch(`${baseUrl}/api/device-mapping/all`, {
             method: 'GET',
             headers: {
-                'authorization': token,
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             }
         })
@@ -393,8 +394,11 @@ document.getElementById('logoutBtn').addEventListener('click', function () {
         })
         .then(data => {
             if (data && data.mappings) {
-                // Tìm thiết bị có deviceId tương ứng
-                const device = data.mappings.find(mapping => mapping.deviceId === deviceId);
+                // Tìm thiết bị có deviceId và userId tương ứng
+                const device = data.mappings.find(mapping => 
+                    mapping.deviceId === deviceId && 
+                    mapping.userId === userId
+                );
                 
                 if (device) {
                     // Cập nhật tiêu đề với tên phòng
