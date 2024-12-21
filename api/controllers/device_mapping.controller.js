@@ -1,29 +1,48 @@
 const DeviceMapping = require('../models/device_mapping.model');
 const { StatusCodes } = require('http-status-codes');
+const AvailableDevice = require('../models/available_device.model');
 
 const addDeviceMapping = async (req, res) => {
     try {
         const { deviceId, roomName } = req.body;
         
-        // Kiểm tra dữ liệu đầu vào
         if (!deviceId || !roomName) {
             return res.status(400).json({
                 err: 'Vui lòng điền đầy đủ Device ID và tên phòng'
             });
         }
 
-        // Kiểm tra xem deviceId đã tồn tại chưa
-        const existingDevice = await DeviceMapping.findOne({ deviceId });
-        if (existingDevice) {
+        // Kiểm tra xem deviceId có trong danh sách available và chưa được sử dụng
+        const availableDevice = await AvailableDevice.findOne({
+            deviceId: deviceId.trim(),
+            added: false
+        });
+
+        if (!availableDevice) {
+            return res.status(400).json({
+                err: 'Device ID không hợp lệ hoặc đã được sử dụng'
+            });
+        }
+
+        // Kiểm tra xem deviceId đã được map chưa
+        const existingMapping = await DeviceMapping.findOne({ deviceId });
+        if (existingMapping) {
             return res.status(400).json({
                 err: 'Device ID này đã được sử dụng'
             });
         }
 
+        // Tạo mapping mới
         const result = await DeviceMapping.create({
             deviceId: deviceId.trim(),
             roomName: roomName.trim()
         });
+
+        // Cập nhật trạng thái added của available device
+        await AvailableDevice.findOneAndUpdate(
+            { deviceId: deviceId.trim() },
+            { added: true }
+        );
 
         return res.status(StatusCodes.CREATED).json({ result });
     } catch (err) {

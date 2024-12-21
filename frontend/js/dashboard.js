@@ -30,8 +30,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const tempChange = 10;
     const tempCheckInterval = 5 * 60 * 1000; // 5 phút
     const gasThreshold = {
-        warning: 20,  // Ngưỡng cảnh báo
-        danger: 30 // Ngưỡng nguy hiểm
+        warning: 200,  // Ngưỡng cảnh báo
+        danger: 300 // Ngưỡng nguy hiểm
     };
 
     // Thêm hàm kiểm tra nhiệt độ
