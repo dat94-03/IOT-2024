@@ -5,14 +5,17 @@ async function fetchRooms() {
         const rooms = {};
 
         try {
-            const response = await fetch(baseUrl + '/api/device-mapping/all');
+            const response = await fetch(baseUrl + '/api/device-mapping/all', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
             const data = await response.json();
-            console.log(data);
             const datas = data.mappings;
             datas.forEach(data => {
                 rooms[data.deviceId] = data;
-                console.log(rooms);
-            })
+            });
         } catch (error) {
             console.error('Lỗi khi tải danh sách phòng:', error);
         }
