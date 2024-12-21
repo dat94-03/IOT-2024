@@ -254,20 +254,7 @@ button:hover {
     color: #721c24;
 }
 
-/* Alert Button */
-.alert-button {
-    padding: 8px 15px;
-    background-color: #1976d2;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-left: 10px;
-}
 
-.alert-button:hover {
-    background-color: #0d47a1;
-}
 
 .device-info {
     background-color: #cfdeed; /* Màu giống với chart */

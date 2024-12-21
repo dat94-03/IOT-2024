@@ -285,10 +285,9 @@ document.getElementById('logoutBtn').addEventListener('click', function () {
     });
 
     // Xử lý tắt còi báo động
-    document.getElementById('stopBuzzerBtn').addEventListener('click', async () => {
+    document.getElementById('stopBuzzerBtn').addEventListener('click',  () => {
         console.log('Stopping buzzer - button clicked');
         gasAlertModal.style.display = 'none';
-
         try {
             const clientId = 'mqttjs_' + Math.random().toString(16).substr(2, 8);
             console.log('Connecting to MQTT with clientId:', clientId);
