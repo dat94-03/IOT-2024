@@ -21,23 +21,12 @@ const swagger = require('./swagger/swagger.json');
 
 const app = express();
 
-// Allowed origins for CORS
-const allowedOrigins = ['*'];
-
 // CORS configuration
 app.use(
   cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (e.g., mobile apps, server-to-server requests)
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true, // Allow cookies, headers, etc.
+    origin: '*', // Allow all origins
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow all HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Allow specific headers
   })
 );
 
