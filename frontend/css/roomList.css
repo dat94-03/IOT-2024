@@ -1,6 +1,11 @@
+:root {
+    --surface-color: #fff;
+    --curve: 15;
+}
+
 /* Tạo nền trang */
 body {
-    background-image: linear-gradient(to top, #fbc2eb 0%, #a6c1ee 100%) !important;
+    background-image: linear-gradient(240deg, #fbc2eb 0%, #a6c9ee 100%) !important;
     font-family: 'Arial', sans-serif;
     padding: 20px;
     
@@ -9,31 +14,216 @@ body {
 /* Phần tử chứa danh sách phòng */
 #roomList {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-    justify-items: center;
-    margin-top: 30px;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 280px));
+    gap: 1.5rem;
+    margin: 2rem auto;
+    padding: 0 2rem;
+    max-width: 1200px;
+    justify-content: center;
 }
 
+.card {
+    position: relative;
+    display: block;
+    height: 320px;
+    border-radius: 15px;
+    overflow: hidden;
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease-out;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.2) 0%,
+        rgba(255, 255, 255, 0.1) 100%
+    );
+    z-index: 0;
+}
+
+.card:hover {
+    transform: translateY(-7px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card__image {   
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
+
+.card__image:not([src]), 
+.card__image[src=""], 
+.card__image[src="null"] {
+    display: none;
+}
+
+.card__overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;      
+    border-radius: 15px;    
+    background-color: rgba(255, 255, 255, 0.95);
+    transform: translateY(100%);
+    transition: .2s ease-in-out;
+}
+
+.card:hover .card__overlay {
+    transform: translateY(0);
+}
+
+.card__header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    padding: 1em;
+    border-radius: 15px 15px 0 0;    
+    background-color: var(--surface-color);
+    transform: translateY(-100%);
+    transition: .2s ease-in-out;
+}
+
+.card__arc {
+    width: 80px;
+    height: 80px;
+    position: absolute;
+    bottom: 100%;
+    right: 0;      
+    z-index: 1;
+    display: none;
+}
+
+.card__arc path {
+    fill: var(--surface-color);
+}       
+
+.card:hover .card__header {
+    transform: translateY(0);
+}
+
+.card__header-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+.card__title {
+    font-size: 1.1em;
+    margin: 0;
+    color: #2d3748;
+    font-weight: bold;
+}
+
+.card__status {
+    font-size: 0.8em;
+    color: #718096;
+}
+
+.card__description {
+    padding: 1em 1.5em;
+    margin: 0;
+    color: #4a5568;
+    font-size: 0.85em;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+}
+
+/* Cập nhật style cho nút xóa */
 .delete-icon {
     position: absolute;
-    top: 4px;   /* Dịch lên thêm 4px */
-    right: 4px; /* Dịch sang bên phải thêm 4px */
-    padding: 0;  /* Loại bỏ padding */
-    border-radius: 50%;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    transition: color 0.3s ease;
-    font-size: 14px;  /* Kích thước icon */
-    color: #808080;  /* Màu xám cho icon */
+    transition: all 0.3s ease;
+    z-index: 2;
+    opacity: 0;
+    transform: scale(0.8);
+}
+
+.card:hover .delete-icon {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.delete-icon i {
+    color: #e53e3e;
+    font-size: 1rem;
 }
 
 .delete-icon:hover {
-    color: #ff0000; /* Màu đỏ khi hover */
+    background: #e53e3e;
+    transform: scale(1.1);
 }
 
+.delete-icon:hover i {
+    color: white;
+}
 
+/* Phần header actions */
+.header-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 1rem 2rem;
+    margin-bottom: 20px;
+}
 
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
 
+.user-name {
+    color: #644141;
+    font-size: 1.1rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    background-color: rgba(102, 44, 44, 0.1);
+    border-radius: 20px;
+    backdrop-filter: blur(5px);
+}
+
+.logout-button {
+    padding: 0.5rem 1.2rem;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.logout-button:hover {
+    background-color: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
 
 /* Thiết kế thẻ phòng */
 .room-card {

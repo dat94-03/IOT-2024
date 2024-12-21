@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // Hiển thị tên người dùng
+    const userName = localStorage.getItem('userName');
+    if (userName) {
+        document.getElementById('userNameDisplay').textContent = `Xin chào, ${userName}`;
+    }
+
     const token = localStorage.getItem('token');
     const baseUrl = 'http://localhost:3000';
     // const roomSelect = document.getElementById('roomSelect');
@@ -265,7 +271,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Đăng xuất khi bấm vào nút "Đăng xuất"
 document.getElementById('logoutBtn').addEventListener('click', function () {
-    // Xóa dữ li���u người dùng (ví dụ: token, session) từ localStorage hoặc sessionStorage
+    // Xóa dữ liệu người dùng (ví dụ: token, session) từ localStorage hoặc sessionStorage
     localStorage.removeItem('Token');
     localStorage.removeItem('userName');
     // Hoặc sessionStorage.removeItem(...) nếu bạn sử dụng sessionStorage

@@ -19,7 +19,7 @@
                 <button id="backBtn" class="back-button" style="pointer-events: auto;">Trở lại</button>
             </div>
             <div class="user-info">
-                <span id="userName"></span>
+                <span id="userNameDisplay" class="user-name">Xin chào, </span>
                 <button id="logoutBtn" class="logout-button">Đăng xuất</button>
             </div>
         </div>
@@ -50,16 +50,25 @@
 
         <div class="sensor-stats">
             <div class="stat-item">
-                <h3>Nhiệt độ:</h3>
-                <span id="tempValue">--°C</span>
+                <div class="stat-content">
+                    <img src="/frontend/Assets/icons8-temperature-96.png" class="sensor-icon" alt="Temperature Icon">
+                    <h3>Nhiệt độ:</h3>
+                    <span id="tempValue">--°C</span>
+                </div>
             </div>
             <div class="stat-item">
-                <h3>Độ ẩm:</h3>
-                <span id="humidValue">--%</span>
+                <div class="stat-content">
+                    <img src="/frontend/Assets/icons8-humidity-80.png" class="sensor-icon" alt="Humidity Icon">
+                    <h3>Độ ẩm:</h3>
+                    <span id="humidValue">--%</span>
+                </div>
             </div>
             <div class="stat-item">
-                <h3>Nồng độ khí gas:</h3>
-                <span id="gasValue">--</span>
+                <div class="stat-content">
+                    <img src="/frontend/Assets/icons8-fire-hazard-100.png" class="sensor-icon" alt="Gas Icon">
+                    <h3>Nồng độ khí gas:</h3>
+                    <span id="gasValue">--</span>
+                </div>
             </div>
         </div>
         

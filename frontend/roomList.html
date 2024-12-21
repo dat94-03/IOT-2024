@@ -7,6 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/roomList.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    
     <style>
         /* Your custom styles (if any) */
     </style>
@@ -15,8 +16,9 @@
 
     <div class="flex flex-col items-center min-h-screen">
         <!-- Logout Button -->
-        <div class="w-full flex justify-end px-8 py-4">
-            <button id="logoutBtn" class="logout-button" class="bg-red-500 text-white px-5 py-2 rounded-md hover:bg-red-600 transition-all duration-200 font-medium shadow-lg">
+        <div class="w-full flex justify-end items-center px-8 py-4">
+            <span id="userNameDisplay" class="user-name"></span>
+            <button id="logoutBtn" class="logout-button bg-red-500 text-white px-5 py-2 rounded-md hover:bg-red-600 transition-all duration-200 font-medium shadow-lg">
                 Đăng xuất
             </button>
         </div>

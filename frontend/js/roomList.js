@@ -1,5 +1,11 @@
 async function fetchRooms() {
     try {
+        // Hiển thị tên người dùng
+    const userName = localStorage.getItem('userName');
+    if (userName) {
+        document.getElementById('userNameDisplay').textContent = `Xin chào, ${userName}`;
+    }
+
         const token = localStorage.getItem('token');
         const baseUrl = 'http://localhost:3000';
         const rooms = {};
@@ -22,22 +28,47 @@ async function fetchRooms() {
 
         // Lấy container để hiển thị danh sách phòng
         const roomListContainer = document.getElementById('roomList');
-        roomListContainer.innerHTML = '';  // Xóa nội dung cũ trước khi render
+        roomListContainer.innerHTML = '';  // Xóa nội dung c trước khi render
 
         // Duyệt qua danh sách các phòng và tạo các phần tử HTML cho mỗi phòng
         Object.entries(rooms).forEach(([key, room]) => {
             const roomElement = document.createElement('div');
-            roomElement.classList.add('room-card', 'relative'); // Thêm class relative để dễ dàng định vị icon
+            roomElement.classList.add('card');
 
-            // Thêm icon xóa ở góc trên cùng
-            const deleteIcon = document.createElement('button');
-            deleteIcon.innerHTML = '<i class="fas fa-trash delete-icon"></i>'; // Thùng rác icon từ Font Awesome
-            deleteIcon.classList.add('delete-icon', 'absolute', 'top-2', 'right-2', 'bg-red-500', 'hover:bg-red-600', 'p-2', 'rounded-full');
-            deleteIcon.onclick = async () => {
+            roomElement.innerHTML = `
+                <img src="/frontend/Assets/iot.png" class="card__icon" alt="IoT Icon" />
+                <button class="delete-icon">
+                    <i class="fas fa-trash"></i>
+                </button>
+                <div class="card__overlay">
+                    <div class="card__header">
+                        <svg class="card__arc" xmlns="http://www.w3.org/2000/svg"><path /></svg>
+                        <div class="card__header-text">
+                            <h3 class="card__title">${room.roomName}</h3>
+                            <span class="card__status">Device ID: ${room.deviceId}</span>
+                        </div>
+                    </div>
+                    <p class="card__description">Nhấn để xem chi tiết thông tin và điều khiển thiết bị trong phòng</p>
+                </div>
+            `;
+
+            // Thêm sự kiện click cho toàn bộ container
+            roomElement.onclick = (event) => {
+                if (!event.target.closest('.delete-icon')) {
+                    const params = new URLSearchParams({
+                        deviceId: room.deviceId,
+                    });
+                    window.location.href = `/frontend/dashboard.html?${params.toString()}`;
+                }
+            };
+
+            // Thêm sự kiện cho nút xóa
+            const deleteButton = roomElement.querySelector('.delete-icon');
+            deleteButton.onclick = async (event) => {
+                event.stopPropagation(); // Ngăn sự kiện click lan ra container
                 if (confirm('Bạn có chắc chắn muốn xóa phòng này?')) {
                     try {
                         const token = localStorage.getItem('token');
-                        // Thêm token vào header của request
                         const response = await fetch(baseUrl + `/api/device-mapping/remove/${room.deviceId}`, {
                             method: 'DELETE',
                             headers: {
@@ -59,41 +90,6 @@ async function fetchRooms() {
                     }
                 }
             };
-            roomElement.appendChild(deleteIcon);
-
-            // Image placeholder, bạn có thể thay đổi tùy theo dữ liệu
-            const roomImage = document.createElement('img');
-            roomImage.src = 'https://via.placeholder.com/200';  // Sử dụng ảnh placeholder
-            roomImage.classList.add('room-image');
-            roomElement.appendChild(roomImage);
-
-            // Room name và description
-            const roomName = document.createElement('h3');
-            roomName.innerText = room.roomName;
-            roomName.classList.add('room-name');
-            roomElement.appendChild(roomName);
-
-            const roomDescription = document.createElement('p');
-            roomDescription.innerText = `Device ID: ${room.deviceId}`;
-            roomDescription.classList.add('room-description');
-            roomElement.appendChild(roomDescription);
-
-            // Button xem chi tiết
-            const buttonView = document.createElement('button');
-            buttonView.innerText = 'Xem chi tiết';
-            buttonView.classList.add('button');
-            buttonView.onclick = () => {
-                // Sử dụng URLSearchParams để tạo query string
-                const params = new URLSearchParams({
-                    deviceId: room.deviceId,
-                    // roomName: room.name
-                });
-                console.log(params)
-                // Điều hướng đến dashboard.html với các tham số
-                window.location.href = `/frontend/dashboard.html?${params.toString()}`;
-            };
-            roomElement.appendChild(buttonView);
-
 
             roomListContainer.appendChild(roomElement);
         });
