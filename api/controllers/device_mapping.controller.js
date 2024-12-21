@@ -83,8 +83,52 @@ const removeDeviceMapping = async (req, res) => {
     }
 }
 
+const updateDeviceMapping = async (req, res) => {
+    try {
+        const deviceId = req.params.deviceId;
+        const { roomName } = req.body;
+        const userId = req.user.userId;
+
+        if (!roomName) {
+            return res.status(400).json({
+                err: 'Vui lòng cung cấp tên phòng mới'
+            });
+        }
+
+        const result = await DeviceMapping.findOneAndUpdate(
+            { 
+                deviceId: deviceId,
+                userId: userId 
+            },
+            { 
+                roomName: roomName.trim() 
+            },
+            { 
+                new: true,
+                runValidators: true 
+            }
+        );
+
+        if (!result) {
+            return res.status(404).json({
+                err: 'Không tìm thấy thiết bị hoặc bạn không có quyền cập nhật'
+            });
+        }
+
+        return res.status(200).json({
+            message: "Cập nhật thành công",
+            result
+        });
+    } catch (err) {
+        return res.status(400).json({
+            err: err.toString()
+        });
+    }
+};
+
 module.exports = {
     addDeviceMapping,
     getAllMappings,
-    removeDeviceMapping
+    removeDeviceMapping,
+    updateDeviceMapping
 }; 
